@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phylax — Wireframe Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --border: #e0e3e8;
+    --text: #1a1d23;
+    --text-muted: #6b7280;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger: #dc2626;
+    --warning: #f59e0b;
+    --success: #16a34a;
+    --info: #0ea5e9;
+    --sidebar-bg: #1a1d23;
+    --sidebar-text: #9ca3af;
+    --sidebar-active: #ffffff;
+    --p1: #dc2626;
+    --p2: #f59e0b;
+    --p3: #2563eb;
+    --p4: #6b7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* Navigation between mockups */
+  .mockup-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: #0f1117; padding: 0 24px; height: 52px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid #2a2d35;
+    overflow-x: auto;
+  }
+  .mockup-nav-label {
+    color: #f59e0b; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+    text-transform: uppercase; margin-right: 16px; white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .mockup-nav button {
+    background: transparent; border: 1px solid #2a2d35; color: #9ca3af;
+    padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif; white-space: nowrap; transition: all 0.15s;
+  }
+  .mockup-nav button:hover { border-color: #4a4d55; color: #e5e7eb; }
+  .mockup-nav button.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  .screen { display: none; padding-top: 52px; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* App shell */
+  .app-shell { display: flex; min-height: calc(100vh - 52px); }
+  .sidebar {
+    width: 220px; background: var(--sidebar-bg); padding: 20px 0; flex-shrink: 0;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-logo {
+    padding: 0 20px 24px; font-size: 20px; font-weight: 700; color: white;
+    letter-spacing: -0.5px; border-bottom: 1px solid #2a2d35; margin-bottom: 16px;
+  }
+  .sidebar-logo span { color: #f59e0b; }
+  .sidebar-item {
+    padding: 10px 20px; color: var(--sidebar-text); font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.15s;
+  }
+  .sidebar-item:hover { color: #d1d5db; background: rgba(255,255,255,0.04); }
+  .sidebar-item.active { color: var(--sidebar-active); background: rgba(255,255,255,0.08); border-left: 3px solid var(--primary); }
+  .sidebar-item .icon { width: 18px; text-align: center; font-size: 15px; }
+  .sidebar-section { padding: 16px 20px 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #4a4d55; font-weight: 600; }
+
+  .main { flex: 1; padding: 28px 32px; max-width: 1100px; }
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Form elements */
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 7px;
+    font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .form-textarea { resize: vertical; min-height: 100px; }
+
+  /* Buttons */
+  .btn {
+    padding: 9px 18px; border-radius: 7px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; font-family: inherit; transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #f0f1f3; }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 11px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .badge-p1 { background: #fef2f2; color: var(--p1); border: 1px solid #fecaca; }
+  .badge-p2 { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+  .badge-p3 { background: #eff6ff; color: var(--p3); border: 1px solid #bfdbfe; }
+  .badge-p4 { background: #f9fafb; color: var(--p4); border: 1px solid #e5e7eb; }
+  .badge-status-open { background: #fef2f2; color: var(--danger); }
+  .badge-status-progress { background: #eff6ff; color: var(--primary); }
+  .badge-status-resolved { background: #f0fdf4; color: var(--success); }
+  .badge-status-closed { background: #f9fafb; color: var(--p4); }
+
+  /* AI suggestion box */
+  .ai-suggestion {
+    background: linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%);
+    border: 1px solid #c7d2fe; border-radius: 8px; padding: 14px 16px;
+    margin-top: 12px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .ai-icon {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .ai-text { font-size: 13px; line-height: 1.5; }
+  .ai-text strong { font-weight: 600; }
+  .ai-actions { margin-top: 8px; display: flex; gap: 8px; }
+  .ai-accept { background: #6366f1; color: white; border: none; padding: 4px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; }
+  .ai-override { background: transparent; color: #6366f1; border: 1px solid #c7d2fe; padding: 4px 12px; border-radius: 5px; font-size: 12px; font-weight: 500; cursor: pointer; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .stat-value { font-size: 28px; font-weight: 700; margin-top: 6px; letter-spacing: -1px; }
+  .stat-change { font-size: 12px; margin-top: 4px; }
+  .stat-change.up { color: var(--success); }
+  .stat-change.down { color: var(--danger); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:hover td { background: #f9fafb; }
+  .ticket-id { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--primary); }
+
+  /* Toggle switch */
+  .toggle-group { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; width: fit-content; margin-bottom: 16px; }
+  .toggle-option {
+    padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
+    background: var(--surface); border: none; color: var(--text-muted); font-family: inherit;
+  }
+  .toggle-option.active { background: var(--primary); color: white; }
+
+  /* Incident detail */
+  .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .meta-item { }
+  .meta-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .meta-value { font-size: 14px; margin-top: 4px; font-weight: 500; }
+
+  /* Timeline */
+  .timeline-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 6px; flex-shrink: 0; }
+  .timeline-dot.system { background: var(--text-muted); }
+  .timeline-content { flex: 1; }
+  .timeline-action { font-size: 13px; }
+  .timeline-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Status flow */
+  .status-flow { display: flex; align-items: center; gap: 6px; margin: 16px 0; flex-wrap: wrap; }
+  .status-step {
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    background: #f0f1f3; color: var(--text-muted);
+  }
+  .status-step.current { background: var(--primary); color: white; }
+  .status-step.done { background: #dcfce7; color: var(--success); }
+  .status-arrow { color: var(--text-muted); font-size: 12px; }
+
+  /* Chart placeholder */
+  .chart-placeholder {
+    height: 180px; background: linear-gradient(180deg, #f8fafc 0%, var(--surface) 100%);
+    border: 1px dashed var(--border); border-radius: 8px;
+    display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 20px;
+  }
+  .chart-bar { border-radius: 4px 4px 0 0; width: 32px; }
+  .chart-bar.b1 { background: var(--primary); }
+  .chart-bar.b2 { background: #93c5fd; }
+  .chart-bar.b3 { background: #dbeafe; }
+
+  /* Donut placeholder */
+  .donut-placeholder {
+    width: 140px; height: 140px; border-radius: 50%; margin: 10px auto;
+    background: conic-gradient(var(--p1) 0deg 50deg, var(--p2) 50deg 140deg, var(--p3) 140deg 280deg, var(--p4) 280deg 360deg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .donut-hole { width: 80px; height: 80px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+
+  /* Postmortem card */
+  .postmortem-preview {
+    background: #fefce8; border: 1px solid #fde68a; border-radius: 8px; padding: 16px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .postmortem-preview h4 { font-size: 14px; margin-bottom: 8px; }
+
+  /* Settings */
+  .setting-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .setting-info { flex: 1; }
+  .setting-name { font-weight: 600; font-size: 14px; }
+  .setting-desc { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Annotations */
+  .annotation {
+    position: relative; display: inline-block;
+  }
+  .annotation::after {
+    content: attr(data-note);
+    position: absolute; top: -8px; right: -8px;
+    background: #f59e0b; color: white; font-size: 10px; font-weight: 700;
+    width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; pointer-events: none;
+  }
+
+  /* Wireframe note banner */
+  .wire-note {
+    background: #fef3c7; border-bottom: 1px solid #fde68a; padding: 8px 24px;
+    font-size: 12px; color: #92400e; display: flex; align-items: center; gap: 8px;
+  }
+  .wire-note strong { font-weight: 700; }
+
+  /* Legend for annotations */
+  .legend {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 18px; margin-top: 20px; font-size: 12px; line-height: 1.8;
+  }
+  .legend-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .legend-item { display: flex; align-items: baseline; gap: 8px; }
+  .legend-num {
+    background: #f59e0b; color: white; font-size: 10px; font-weight: 700;
+    width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .stale-row { background: #fff7ed; }
+  .stale-indicator { color: var(--warning); font-size: 11px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- Mockup Navigation -->
+<nav class="mockup-nav">
+  <span class="mockup-nav-label">Phylax Wireframes</span>
+  <button class="active" onclick="showScreen('submit')">① Submit</button>
+  <button onclick="showScreen('queue')">② Triage Queue</button>
+  <button onclick="showScreen('detail')">③ Incident Detail</button>
+  <button onclick="showScreen('dashboard')">④ Dashboard</button>
+  <button onclick="showScreen('settings')">⑤ Settings</button>
+</nav>
+
+<!-- ==================== SCREEN 1: SUBMIT FORM ==================== -->
+<div id="submit" class="screen active">
+  <div class="wire-note"><strong>Screen 1 of 5</strong> — Incident Submission Form &nbsp;|&nbsp; User Stories: #1, #2, #3</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">P<span>H</span>YLAX</div>
+      <div class="sidebar-item active"><span class="icon">+</span> New Incident</div>
+      <div class="sidebar-item"><span class="icon">☰</span> My Incidents</div>
+      <div class="sidebar-section">Admin</div>
+      <div class="sidebar-item"><span class="icon">⊞</span> Triage Queue</div>
+      <div class="sidebar-item"><span class="icon">◫</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">⚙</span> Settings</div>
+    </aside>
+    <div class="main">
+      <div class="page-header">
+        <div class="page-title">Report an Incident</div>
+        <div class="page-subtitle">Describe what happened. AI will suggest priority and category.</div>
+      </div>
+
+      <div class="card" style="max-width: 640px;">
+        <div class="form-group">
+          <label class="form-label">Title *</label>
+          <input class="form-input" type="text" placeholder="Brief summary of the issue" value="Production API returning 500 errors on /checkout">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <textarea class="form-textarea" rows="5" placeholder="Describe the issue in detail — what happened, what's affected, when it started">Multiple customers reporting checkout failures since approximately 2:15 PM. API logs show database connection pool exhaustion. Payment processing is completely blocked. Revenue impact is active.</textarea>
+          <div class="form-hint">Be specific — the AI uses your description to suggest severity and category.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category (optional)</label>
+          <select class="form-select">
+            <option>— Let AI suggest —</option>
+            <option>Infrastructure</option>
+            <option>Application</option>
+            <option>Network</option>
+            <option>Security</option>
+            <option>Access / Permissions</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <!-- AI Suggestion -->
+        <div class="ai-suggestion">
+          <div class="ai-icon">AI</div>
+          <div>
+            <div class="ai-text">
+              <strong>AI Assessment:</strong> Based on your description, this appears to be a
+              <span style="color: var(--p1); font-weight: 700;">P1 — Critical</span> incident
+              in the <strong>Infrastructure</strong> category.
+              <br>Revenue-impacting production outage with active customer impact.
+            </div>
+            <div class="ai-actions">
+              <button class="ai-accept">✓ Accept Suggestion</button>
+              <button class="ai-override">Override Manually</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+          <button class="btn btn-primary">Submit Incident</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Success state preview -->
+      <div class="card" style="max-width: 640px; border-color: var(--success); background: #f0fdf4;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <span style="color: var(--success); font-size: 20px;">✓</span>
+          <strong style="font-size: 15px;">Incident Created</strong>
+        </div>
+        <div style="font-size: 14px; color: var(--text-muted);">
+          Your ticket number is <span class="ticket-id" style="font-size: 15px;">PHX-000042</span>
+          <br>You can track its status from "My Incidents" in the sidebar.
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Design Notes</div>
+        <div class="legend-item"><span class="legend-num">1</span> AI suggestion appears after description is typed (debounced API call to Claude)</div>
+        <div class="legend-item"><span class="legend-num">2</span> "Accept" auto-fills severity + category. "Override" reveals manual dropdowns.</div>
+        <div class="legend-item"><span class="legend-num">3</span> Success state shows ticket number immediately — confirms submission worked</div>
+        <div class="legend-item"><span class="legend-num">4</span> Category dropdown defaults to "Let AI suggest" — submitter doesn't need to know categories</div>
+        <div class="legend-item"><span class="legend-num">5</span> Only 3 fields: title, description, optional category. Minimal friction.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 2: TRIAGE QUEUE ==================== -->
+<div id="queue" class="screen">
+  <div class="wire-note"><strong>Screen 2 of 5</strong> — Triage Queue &nbsp;|&nbsp; User Stories: #6, #7, #8, #9, #10</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">P<span>H</span>YLAX</div>
+      <div class="sidebar-item"><span class="icon">+</span> New Incident</div>
+      <div class="sidebar-item"><span class="icon">☰</span> My Incidents</div>
+      <div class="sidebar-section">Admin</div>
+      <div class="sidebar-item active"><span class="icon">⊞</span> Triage Queue</div>
+      <div class="sidebar-item"><span class="icon">◫</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">⚙</span> Settings</div>
+    </aside>
+    <div class="main">
+      <div class="page-header">
+        <div class="page-title">Triage Queue</div>
+        <div class="page-subtitle">7 incidents awaiting triage · 3 unassigned</div>
+      </div>
+
+      <!-- Queue Strategy Toggle -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div class="toggle-group">
+          <button class="toggle-option">FIFO</button>
+          <button class="toggle-option active">Priority</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <select class="form-select" style="width: 150px; padding: 6px 10px; font-size: 12px;">
+            <option>All Statuses</option>
+            <option>Open</option>
+            <option>In Progress</option>
+          </select>
+          <select class="form-select" style="width: 150px; padding: 6px 10px; font-size: 12px;">
+            <option>All Severities</option>
+            <option>P1 — Critical</option>
+            <option>P2 — High</option>
+            <option>P3 — Medium</option>
+            <option>P4 — Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Age</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ticket-id">PHX-000042</span></td>
+                <td style="font-weight: 500;">Production API returning 500 errors</td>
+                <td><span class="badge badge-p1">P1 Critical</span></td>
+                <td>Infrastructure</td>
+                <td><span class="badge badge-status-open">Open</span></td>
+                <td style="color: var(--danger); font-weight: 600;">Unassigned</td>
+                <td>12m</td>
+                <td><button class="btn btn-sm btn-primary">Assign</button></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">PHX-000041</span></td>
+                <td style="font-weight: 500;">SSL certificate expiring in 48 hours</td>
+                <td><span class="badge badge-p1">P1 Critical</span></td>
+                <td>Security</td>
+                <td><span class="badge badge-status-progress">In Progress</span></td>
+                <td>Sarah Chen</td>
+                <td>2h</td>
+                <td><button class="btn btn-sm btn-secondary">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">PHX-000040</span></td>
+                <td style="font-weight: 500;">Dashboard charts not loading for finance team</td>
+                <td><span class="badge badge-p2">P2 High</span></td>
+                <td>Application</td>
+                <td><span class="badge badge-status-open">Open</span></td>
+                <td style="color: var(--danger); font-weight: 600;">Unassigned</td>
+                <td>4h</td>
+                <td><button class="btn btn-sm btn-primary">Assign</button></td>
+              </tr>
+              <tr class="stale-row">
+                <td><span class="ticket-id">PHX-000037</span></td>
+                <td style="font-weight: 500;">VPN disconnects intermittently <span class="stale-indicator">⚠ STALE 3d</span></td>
+                <td><span class="badge badge-p2">P2 High</span></td>
+                <td>Network</td>
+                <td><span class="badge badge-status-progress">In Progress</span></td>
+                <td>James Wu</td>
+                <td>3d</td>
+                <td><button class="btn btn-sm btn-secondary">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">PHX-000039</span></td>
+                <td style="font-weight: 500;">New hire needs access to staging environment</td>
+                <td><span class="badge badge-p3">P3 Medium</span></td>
+                <td>Access</td>
+                <td><span class="badge badge-status-open">Open</span></td>
+                <td style="color: var(--danger); font-weight: 600;">Unassigned</td>
+                <td>6h</td>
+                <td><button class="btn btn-sm btn-primary">Assign</button></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">PHX-000038</span></td>
+                <td style="font-weight: 500;">Printer on 3rd floor jams frequently</td>
+                <td><span class="badge badge-p4">P4 Low</span></td>
+                <td>Other</td>
+                <td><span class="badge badge-status-progress">In Progress</span></td>
+                <td>Sarah Chen</td>
+                <td>2d</td>
+                <td><button class="btn btn-sm btn-secondary">View</button></td>
+              </tr>
+              <tr>
+                <td><span class="ticket-id">PHX-000036</span></td>
+                <td style="font-weight: 500;">Update office WiFi password on signage</td>
+                <td><span class="badge badge-p4">P4 Low</span></td>
+                <td>Other</td>
+                <td><span class="badge badge-status-resolved">Resolved</span></td>
+                <td>James Wu</td>
+                <td>5d</td>
+                <td><button class="btn btn-sm btn-secondary">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Design Notes</div>
+        <div class="legend-item"><span class="legend-num">1</span> FIFO/Priority toggle at top — changes ORDER BY clause (created_at vs severity)</div>
+        <div class="legend-item"><span class="legend-num">2</span> In Priority mode: P1s float to top regardless of age. In FIFO: oldest first.</div>
+        <div class="legend-item"><span class="legend-num">3</span> "Unassigned" in red draws the eye to what needs immediate action</div>
+        <div class="legend-item"><span class="legend-num">4</span> Stale indicator (⚠ STALE 3d) flags incidents with no update — user story #17</div>
+        <div class="legend-item"><span class="legend-num">5</span> Severity badges are color-coded: red P1, amber P2, blue P3, grey P4</div>
+        <div class="legend-item"><span class="legend-num">6</span> Clicking ticket ID or "View" opens the Incident Detail screen</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 3: INCIDENT DETAIL ==================== -->
+<div id="detail" class="screen">
+  <div class="wire-note"><strong>Screen 3 of 5</strong> — Incident Detail &nbsp;|&nbsp; User Stories: #4, #5, #10, #11, #12, #13, #14, #15, #18</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">P<span>H</span>YLAX</div>
+      <div class="sidebar-item"><span class="icon">+</span> New Incident</div>
+      <div class="sidebar-item"><span class="icon">☰</span> My Incidents</div>
+      <div class="sidebar-section">Admin</div>
+      <div class="sidebar-item active"><span class="icon">⊞</span> Triage Queue</div>
+      <div class="sidebar-item"><span class="icon">◫</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">⚙</span> Settings</div>
+    </aside>
+    <div class="main">
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="ticket-id" style="font-size: 14px;">PHX-000042</span>
+            <span class="badge badge-p1">P1 Critical</span>
+            <span class="badge badge-status-progress">In Progress</span>
+          </div>
+          <div class="page-title" style="margin-top: 8px;">Production API returning 500 errors on /checkout</div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary btn-sm">Edit Severity</button>
+          <button class="btn btn-primary btn-sm">→ Move to Resolved</button>
+        </div>
+      </div>
+
+      <!-- Status Flow -->
+      <div class="status-flow">
+        <span class="status-step done">Open</span>
+        <span class="status-arrow">→</span>
+        <span class="status-step current">In Progress</span>
+        <span class="status-arrow">→</span>
+        <span class="status-step">Resolved</span>
+        <span class="status-arrow">→</span>
+        <span class="status-step">Closed</span>
+      </div>
+
+      <div class="detail-grid">
+        <!-- Left column: main content -->
+        <div>
+          <!-- Description -->
+          <div class="card">
+            <div class="card-title">Description</div>
+            <p style="font-size: 14px; line-height: 1.6;">Multiple customers reporting checkout failures since approximately 2:15 PM. API logs show database connection pool exhaustion. Payment processing is completely blocked. Revenue impact is active.</p>
+          </div>
+
+          <!-- Comments / Notes -->
+          <div class="card">
+            <div class="card-title">Activity</div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-action"><strong>Sarah Chen</strong> added a note</div>
+                <p style="font-size: 13px; margin-top: 4px; padding: 8px 12px; background: #f9fafb; border-radius: 6px;">Identified root cause: connection pool max set to 10, should be 50. Applying config change now.</p>
+                <div class="timeline-time">Today at 2:42 PM</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: #8b5cf6;"></div>
+              <div class="timeline-content">
+                <div class="timeline-action" style="color: #8b5cf6; font-style: italic;"><strong>Internal Note</strong> (not visible to submitter)</div>
+                <p style="font-size: 13px; margin-top: 4px; padding: 8px 12px; background: #faf5ff; border-radius: 6px; border: 1px solid #e9d5ff;">This is the third pool exhaustion this month. Need to investigate connection leak in the checkout service. Flagging for postmortem.</p>
+                <div class="timeline-time">Today at 2:48 PM</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot system"></div>
+              <div class="timeline-content">
+                <div class="timeline-action" style="color: var(--text-muted);">System: Status changed from <strong>Open</strong> → <strong>In Progress</strong></div>
+                <div class="timeline-time">Today at 2:35 PM</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot system"></div>
+              <div class="timeline-content">
+                <div class="timeline-action" style="color: var(--text-muted);">System: Assigned to <strong>Sarah Chen</strong></div>
+                <div class="timeline-time">Today at 2:34 PM</div>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot system"></div>
+              <div class="timeline-content">
+                <div class="timeline-action" style="color: var(--text-muted);">System: Incident created. AI suggested <strong>P1 Critical / Infrastructure</strong></div>
+                <div class="timeline-time">Today at 2:28 PM</div>
+              </div>
+            </div>
+
+            <!-- Add comment box -->
+            <div style="margin-top: 16px;">
+              <textarea class="form-textarea" rows="3" placeholder="Add a comment or note..."></textarea>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn btn-primary btn-sm">Add Comment</button>
+                <button class="btn btn-secondary btn-sm" style="border-color: #e9d5ff; color: #8b5cf6;">Add Internal Note</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resolution notes (shown when resolving) -->
+          <div class="card" style="border-color: var(--success);">
+            <div class="card-title" style="color: var(--success);">Resolution Notes (required to resolve)</div>
+            <textarea class="form-textarea" rows="3" placeholder="Describe what fixed the issue and what was the root cause...">Increased database connection pool from 10 to 50 connections. Root cause: connection leak in checkout service not releasing connections after timeout. Hotfix applied, monitoring for recurrence.</textarea>
+            <button class="btn btn-primary btn-sm" style="margin-top: 10px; background: var(--success);">✓ Resolve Incident</button>
+          </div>
+
+          <!-- AI Postmortem -->
+          <div class="card">
+            <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+              <span style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px;">AI</span>
+              Generated Postmortem
+            </div>
+            <div class="postmortem-preview">
+              <h4>Incident Postmortem — PHX-000042</h4>
+              <p><strong>Impact:</strong> Checkout API unavailable for ~30 minutes. Payment processing blocked for all customers.</p>
+              <p style="margin-top: 6px;"><strong>Root Cause:</strong> Database connection pool configured with maximum of 10 connections. Under load, pool exhausted causing 500 errors on all database-dependent endpoints.</p>
+              <p style="margin-top: 6px;"><strong>Resolution:</strong> Connection pool limit increased to 50. Hotfix deployed to address connection leak in checkout service.</p>
+              <p style="margin-top: 6px;"><strong>Prevention:</strong> Add connection pool monitoring alerts. Implement connection timeout and release logic review across all services.</p>
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-secondary">📋 Copy to Clipboard</button>
+              <button class="btn btn-sm btn-secondary">✏️ Edit</button>
+              <button class="btn btn-sm btn-secondary">🔄 Regenerate</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: metadata sidebar -->
+        <div>
+          <div class="card">
+            <div class="card-title">Details</div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="meta-item">
+                <div class="meta-label">Severity</div>
+                <div class="meta-value"><span class="badge badge-p1">P1 Critical</span></div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">Infrastructure</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value"><span class="badge badge-status-progress">In Progress</span></div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Assigned To</div>
+                <div class="meta-value">Sarah Chen</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Submitted By</div>
+                <div class="meta-value">Mike Torres</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Created</div>
+                <div class="meta-value">Today at 2:28 PM</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Last Updated</div>
+                <div class="meta-value">Today at 2:48 PM</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Time Open</div>
+                <div class="meta-value" style="color: var(--danger); font-weight: 700;">32 minutes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">AI Assessment</div>
+            <div class="ai-suggestion" style="margin-top: 0;">
+              <div class="ai-icon" style="width: 22px; height: 22px; font-size: 11px;">AI</div>
+              <div class="ai-text" style="font-size: 12px;">
+                Classified as <strong>P1 Critical</strong> due to: active revenue impact, production environment, multiple customers affected.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Design Notes</div>
+        <div class="legend-item"><span class="legend-num">1</span> Status flow bar shows enforced state machine — can only move to next valid state</div>
+        <div class="legend-item"><span class="legend-num">2</span> "→ Move to Resolved" button only shows valid transitions. Can't skip to Closed.</div>
+        <div class="legend-item"><span class="legend-num">3</span> Internal notes (purple) vs public comments — user story #13</div>
+        <div class="legend-item"><span class="legend-num">4</span> Every system event logged in timeline = audit trail (user story #15)</div>
+        <div class="legend-item"><span class="legend-num">5</span> Resolution notes required before resolving — user story #14</div>
+        <div class="legend-item"><span class="legend-num">6</span> AI postmortem generated from description + notes + resolution — user story #18</div>
+        <div class="legend-item"><span class="legend-num">7</span> Right sidebar shows metadata including "Time Open" — feeds time-to-resolve metric</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 4: DASHBOARD ==================== -->
+<div id="dashboard" class="screen">
+  <div class="wire-note"><strong>Screen 4 of 5</strong> — Dashboard &nbsp;|&nbsp; User Stories: #16, #17, #19</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">P<span>H</span>YLAX</div>
+      <div class="sidebar-item"><span class="icon">+</span> New Incident</div>
+      <div class="sidebar-item"><span class="icon">☰</span> My Incidents</div>
+      <div class="sidebar-section">Admin</div>
+      <div class="sidebar-item"><span class="icon">⊞</span> Triage Queue</div>
+      <div class="sidebar-item active"><span class="icon">◫</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">⚙</span> Settings</div>
+    </aside>
+    <div class="main">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Operational overview · Last updated 2 minutes ago</div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Open Incidents</div>
+          <div class="stat-value">12</div>
+          <div class="stat-change up">↓ 3 from last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Time to Resolve</div>
+          <div class="stat-value">4.2h</div>
+          <div class="stat-change up">↓ 1.1h improvement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unassigned</div>
+          <div class="stat-value" style="color: var(--danger);">3</div>
+          <div class="stat-change down">↑ 1 from yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Resolved This Week</div>
+          <div class="stat-value">28</div>
+          <div class="stat-change up">↑ 8 from last week</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Incidents by Status -->
+        <div class="card">
+          <div class="card-title">Incidents by Status</div>
+          <div class="chart-placeholder">
+            <div>
+              <div class="chart-bar b1" style="height: 120px;"></div>
+              <div style="text-align: center; font-size: 11px; margin-top: 4px; color: var(--text-muted);">Open</div>
+            </div>
+            <div>
+              <div class="chart-bar b1" style="height: 90px;"></div>
+              <div style="text-align: center; font-size: 11px; margin-top: 4px; color: var(--text-muted);">In Prog</div>
+            </div>
+            <div>
+              <div class="chart-bar b2" style="height: 140px;"></div>
+              <div style="text-align: center; font-size: 11px; margin-top: 4px; color: var(--text-muted);">Resolved</div>
+            </div>
+            <div>
+              <div class="chart-bar b3" style="height: 60px;"></div>
+              <div style="text-align: center; font-size: 11px; margin-top: 4px; color: var(--text-muted);">Closed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Incidents by Severity -->
+        <div class="card">
+          <div class="card-title">Incidents by Severity</div>
+          <div style="display: flex; align-items: center; justify-content: center; height: 180px;">
+            <div class="donut-placeholder">
+              <div class="donut-hole">47</div>
+            </div>
+            <div style="margin-left: 20px; font-size: 13px; line-height: 2;">
+              <div><span style="display: inline-block; width: 10px; height: 10px; background: var(--p1); border-radius: 2px; margin-right: 6px;"></span>P1 Critical — 4</div>
+              <div><span style="display: inline-block; width: 10px; height: 10px; background: var(--p2); border-radius: 2px; margin-right: 6px;"></span>P2 High — 11</div>
+              <div><span style="display: inline-block; width: 10px; height: 10px; background: var(--p3); border-radius: 2px; margin-right: 6px;"></span>P3 Medium — 22</div>
+              <div><span style="display: inline-block; width: 10px; height: 10px; background: var(--p4); border-radius: 2px; margin-right: 6px;"></span>P4 Low — 10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Volume Over Time -->
+        <div class="card">
+          <div class="card-title">Weekly Volume (last 8 weeks)</div>
+          <div class="chart-placeholder">
+            <div><div class="chart-bar b1" style="height: 40px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 55px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 70px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 45px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 90px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 60px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 50px;"></div></div>
+            <div><div class="chart-bar b1" style="height: 35px;"></div></div>
+          </div>
+        </div>
+
+        <!-- Avg Time to Resolve by Severity -->
+        <div class="card">
+          <div class="card-title">Avg. Time to Resolve by Severity</div>
+          <div style="padding: 16px 0;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <span class="badge badge-p1" style="width: 80px; text-align: center;">P1</span>
+              <div style="flex: 1; background: #f0f1f3; height: 20px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 25%; height: 100%; background: var(--p1); border-radius: 4px;"></div>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; width: 50px;">1.2h</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <span class="badge badge-p2" style="width: 80px; text-align: center;">P2</span>
+              <div style="flex: 1; background: #f0f1f3; height: 20px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 55%; height: 100%; background: var(--p2); border-radius: 4px;"></div>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; width: 50px;">4.8h</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <span class="badge badge-p3" style="width: 80px; text-align: center;">P3</span>
+              <div style="flex: 1; background: #f0f1f3; height: 20px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 75%; height: 100%; background: var(--p3); border-radius: 4px;"></div>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; width: 50px;">8.3h</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="badge badge-p4" style="width: 80px; text-align: center;">P4</span>
+              <div style="flex: 1; background: #f0f1f3; height: 20px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 95%; height: 100%; background: var(--p4); border-radius: 4px;"></div>
+              </div>
+              <span style="font-size: 13px; font-weight: 600; width: 50px;">18.1h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stale Incidents -->
+      <div class="card">
+        <div class="card-title" style="color: var(--warning);">⚠ Stale Incidents (no update > 48 hours)</div>
+        <table>
+          <thead>
+            <tr><th>Ticket</th><th>Title</th><th>Severity</th><th>Assigned</th><th>Last Update</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="ticket-id">PHX-000037</span></td>
+              <td>VPN disconnects intermittently</td>
+              <td><span class="badge badge-p2">P2</span></td>
+              <td>James Wu</td>
+              <td style="color: var(--warning); font-weight: 600;">3 days ago</td>
+              <td><button class="btn btn-sm btn-secondary">Nudge</button></td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">PHX-000033</span></td>
+              <td>Backup job failing on fileserver-02</td>
+              <td><span class="badge badge-p3">P3</span></td>
+              <td>Sarah Chen</td>
+              <td style="color: var(--warning); font-weight: 600;">4 days ago</td>
+              <td><button class="btn btn-sm btn-secondary">Nudge</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Design Notes</div>
+        <div class="legend-item"><span class="legend-num">1</span> Four stat cards = the numbers an admin checks first thing every morning</div>
+        <div class="legend-item"><span class="legend-num">2</span> Time-to-resolve by severity proves the value of priority triage over FIFO</div>
+        <div class="legend-item"><span class="legend-num">3</span> Stale incidents section catches things falling through cracks — user story #17</div>
+        <div class="legend-item"><span class="legend-num">4</span> "Nudge" button could send a notification or just highlight the ticket</div>
+        <div class="legend-item"><span class="legend-num">5</span> All chart data comes from the same incidents table + incident_history table</div>
+        <div class="legend-item"><span class="legend-num">6</span> Analytics Service integration (#19) would be a separate section or link out</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN 5: SETTINGS ==================== -->
+<div id="settings" class="screen">
+  <div class="wire-note"><strong>Screen 5 of 5</strong> — Admin Settings &nbsp;|&nbsp; User Stories: #20, #21</div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">P<span>H</span>YLAX</div>
+      <div class="sidebar-item"><span class="icon">+</span> New Incident</div>
+      <div class="sidebar-item"><span class="icon">☰</span> My Incidents</div>
+      <div class="sidebar-section">Admin</div>
+      <div class="sidebar-item"><span class="icon">⊞</span> Triage Queue</div>
+      <div class="sidebar-item"><span class="icon">◫</span> Dashboard</div>
+      <div class="sidebar-item active"><span class="icon">⚙</span> Settings</div>
+    </aside>
+    <div class="main" style="max-width: 700px;">
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+        <div class="page-subtitle">Configure how Phylax works for your team</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Queue Configuration</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Default Queue Strategy</div>
+            <div class="setting-desc">Controls how the triage queue sorts incoming incidents</div>
+          </div>
+          <div class="toggle-group">
+            <button class="toggle-option">FIFO</button>
+            <button class="toggle-option active">Priority</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Stale Incident Threshold</div>
+            <div class="setting-desc">Flag incidents with no activity after this period</div>
+          </div>
+          <select class="form-select" style="width: 140px;">
+            <option>24 hours</option>
+            <option selected>48 hours</option>
+            <option>72 hours</option>
+            <option>1 week</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Severity Levels</div>
+        <table style="font-size: 13px;">
+          <thead>
+            <tr><th>Level</th><th>Label</th><th>Description</th><th>Target Resolve</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-p1">P1</span></td>
+              <td>Critical</td>
+              <td style="color: var(--text-muted);">Production down, revenue impact, security breach</td>
+              <td>1 hour</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-p2">P2</span></td>
+              <td>High</td>
+              <td style="color: var(--text-muted);">Major feature broken, significant user impact</td>
+              <td>4 hours</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-p3">P3</span></td>
+              <td>Medium</td>
+              <td style="color: var(--text-muted);">Degraded service, workaround available</td>
+              <td>24 hours</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-p4">P4</span></td>
+              <td>Low</td>
+              <td style="color: var(--text-muted);">Minor issue, cosmetic, enhancement request</td>
+              <td>1 week</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Team Members</div>
+        <table style="font-size: 13px;">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight: 500;">Sarah Chen</td>
+              <td style="color: var(--text-muted);">sarah@company.com</td>
+              <td><span class="badge" style="background: #eff6ff; color: var(--primary);">Admin</span></td>
+              <td><button class="btn btn-sm btn-secondary">Edit</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 500;">James Wu</td>
+              <td style="color: var(--text-muted);">james@company.com</td>
+              <td><span class="badge" style="background: #f0f1f3; color: var(--text-muted);">Agent</span></td>
+              <td><button class="btn btn-sm btn-secondary">Edit</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 500;">Mike Torres</td>
+              <td style="color: var(--text-muted);">mike@company.com</td>
+              <td><span class="badge" style="background: #f0f1f3; color: var(--text-muted);">Submitter</span></td>
+              <td><button class="btn btn-sm btn-secondary">Edit</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn btn-primary btn-sm" style="margin-top: 12px;">+ Add Team Member</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Categories</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Infrastructure ✕</span>
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Application ✕</span>
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Network ✕</span>
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Security ✕</span>
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Access / Permissions ✕</span>
+          <span class="badge" style="background: #f0f1f3; color: var(--text); padding: 6px 12px; font-size: 13px;">Other ✕</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input class="form-input" type="text" placeholder="New category name..." style="width: 200px;">
+          <button class="btn btn-secondary btn-sm">+ Add</button>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">Design Notes</div>
+        <div class="legend-item"><span class="legend-num">1</span> Queue strategy stored in settings table — one row, one value</div>
+        <div class="legend-item"><span class="legend-num">2</span> Stale threshold is configurable per team — not hardcoded</div>
+        <div class="legend-item"><span class="legend-num">3</span> Three roles: Admin (full access), Agent (triage + resolve), Submitter (create + view own)</div>
+        <div class="legend-item"><span class="legend-num">4</span> Categories are dynamic — admin adds/removes without code changes</div>
+        <div class="legend-item"><span class="legend-num">5</span> Severity levels shown for reference — target resolve times inform AI assessment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.mockup-nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import pool from '@/lib/db';
+import Link from 'next/link';
 
 // Server component — no 'use client' needed, data fetched on the server
 export default async function QueuePage() {
@@ -11,7 +12,9 @@ export default async function QueuePage() {
     ? 'ORDER BY created_at ASC'
     : 'ORDER BY severity ASC, created_at ASC';
 
-  const result = await pool.query(`SELECT * FROM incidents ${orderBy}`);
+  const result = await pool.query(
+    `SELECT * FROM incidents WHERE status IN ('Open', 'In Progress') ${orderBy}`
+  );
   const incidents = result.rows;
 
   const severityColor: Record<string, string> = {
@@ -62,7 +65,9 @@ export default async function QueuePage() {
                 style={{ borderBottom: '1px solid #f3f4f6' }}
               >
                 <td style={{ padding: '12px 8px', fontFamily: 'monospace', fontSize: 14 }}>
-                  {incident.ticket_number}
+                  <Link href={`/incidents/${incident.id}`} style={{ color: '#2563eb', textDecoration: 'underline' }}>
+                    {incident.ticket_number}
+                  </Link>
                 </td>
                 <td style={{ padding: '12px 8px' }}>
                   {incident.title}

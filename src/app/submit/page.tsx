@@ -6,9 +6,44 @@ export default function SubmitPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Other');
+  const [severity, setSeverity] = useState('P4');
   const [submitted, setSubmitted] = useState(false);
   const [ticketNumber, setTicketNumber] = useState('');
   const [error, setError] = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState<{ severity: string; reason: string } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const handleSuggest = async () => {
+    if (!title.trim() || !description.trim()) {
+      setError('Enter a title and description first');
+      return;
+    }
+
+    setAiLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/ai/suggest-severity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description }),
+      });
+
+      if (!response.ok) {
+        setError('AI suggestion failed');
+        setAiLoading(false);
+        return;
+      }
+
+      const suggestion = await response.json();
+      setAiSuggestion(suggestion);
+      setSeverity(suggestion.severity);
+      setAiLoading(false);
+    } catch (err) {
+      setError('Failed to get AI suggestion');
+      setAiLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +57,8 @@ export default function SubmitPage() {
           title,
           description,
           category,
+          severity,
           reported_by: 'Demo User',
-          severity: 'P4',
         }),
       });
 
@@ -55,6 +90,8 @@ export default function SubmitPage() {
             setTitle('');
             setDescription('');
             setCategory('Other');
+            setSeverity('P4');
+            setAiSuggestion(null);
           }}
           style={{ marginTop: 24, padding: '10px 20px', cursor: 'pointer' }}
         >
@@ -96,7 +133,7 @@ export default function SubmitPage() {
           />
         </div>
 
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16 }}>
           <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
             Category
           </label>
@@ -112,6 +149,53 @@ export default function SubmitPage() {
             <option value="Access">Access</option>
             <option value="Other">Other</option>
           </select>
+        </div>
+
+        {/* AI Severity Suggestion — Story #2 */}
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
+            Severity
+          </label>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <select
+              value={severity}
+              onChange={(e) => setSeverity(e.target.value)}
+              style={{ flex: 1, padding: 10, fontSize: 16 }}
+            >
+              <option value="P1">P1 — Critical</option>
+              <option value="P2">P2 — High</option>
+              <option value="P3">P3 — Medium</option>
+              <option value="P4">P4 — Low</option>
+            </select>
+            <button
+              type="button"
+              onClick={handleSuggest}
+              disabled={aiLoading}
+              style={{
+                padding: '10px 16px', fontSize: 14, fontWeight: 600,
+                cursor: aiLoading ? 'not-allowed' : 'pointer',
+                borderRadius: 6, border: 'none',
+                backgroundColor: '#7c3aed', color: 'white',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {aiLoading ? 'Analyzing...' : 'AI Suggest'}
+            </button>
+          </div>
+
+          {aiSuggestion && (
+            <div style={{
+              marginTop: 8, padding: 12, borderRadius: 8,
+              backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd',
+            }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#7c3aed', marginBottom: 4 }}>
+                AI Suggested: {aiSuggestion.severity}
+              </div>
+              <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+                {aiSuggestion.reason}
+              </p>
+            </div>
+          )}
         </div>
 
         {error && (

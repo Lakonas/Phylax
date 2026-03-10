@@ -128,6 +128,8 @@ export default async function IncidentDetailPage({
       <StatusActions
         incidentId={incident.id}
         currentStatus={incident.status}
+        currentSeverity={incident.severity}
+        currentAssignee={incident.assigned_to}
         allowedTransitions={allowedTransitions}
       />
 

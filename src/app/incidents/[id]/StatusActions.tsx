@@ -3,13 +3,20 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const SEVERITIES = ['P1', 'P2', 'P3', 'P4'];
+const TEAM_MEMBERS = ['Sarah Chen', 'James Park', 'Alex Rivera', 'Unassigned'];
+
 export default function StatusActions({
   incidentId,
   currentStatus,
+  currentSeverity,
+  currentAssignee,
   allowedTransitions,
 }: {
   incidentId: string;
   currentStatus: string;
+  currentSeverity: string;
+  currentAssignee: string | null;
   allowedTransitions: string[];
 }) {
   const router = useRouter();
@@ -17,22 +24,11 @@ export default function StatusActions({
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleTransition = async (newStatus: string) => {
+  const handleUpdate = async (body: Record<string, string | null>) => {
     setError('');
     setLoading(true);
 
     try {
-      const body: Record<string, string> = { status: newStatus };
-
-      if (newStatus === 'Resolved') {
-        if (!resolutionNotes.trim()) {
-          setError('Resolution notes are required');
-          setLoading(false);
-          return;
-        }
-        body.resolution_notes = resolutionNotes;
-      }
-
       const response = await fetch(`/api/incidents/${incidentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +50,35 @@ export default function StatusActions({
     }
   };
 
-  if (allowedTransitions.length === 0) {
+  const handleTransition = async (newStatus: string) => {
+    const body: Record<string, string> = { status: newStatus };
+
+    if (newStatus === 'Resolved') {
+      if (!resolutionNotes.trim()) {
+        setError('Resolution notes are required');
+        return;
+      }
+      body.resolution_notes = resolutionNotes;
+    }
+
+    await handleUpdate(body);
+  };
+
+  const handleSeverityChange = async (newSeverity: string) => {
+    if (newSeverity !== currentSeverity) {
+      await handleUpdate({ severity: newSeverity });
+    }
+  };
+
+  const handleAssigneeChange = async (newAssignee: string) => {
+    const value = newAssignee === 'Unassigned' ? null : newAssignee;
+    if (value !== currentAssignee) {
+      await handleUpdate({ assigned_to: value });
+    }
+  };
+
+  // Hide actions section entirely for closed incidents
+  if (currentStatus === 'Closed') {
     return null;
   }
 
@@ -67,6 +91,41 @@ export default function StatusActions({
     }}>
       <h3 style={{ fontSize: 16, marginBottom: 12 }}>Actions</h3>
 
+      {/* Assignment and Severity — Story #9, #10 */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+        <div style={{ flex: 1 }}>
+          <label style={{ display: 'block', fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+            Assigned To
+          </label>
+          <select
+            value={currentAssignee || 'Unassigned'}
+            onChange={(e) => handleAssigneeChange(e.target.value)}
+            disabled={loading}
+            style={{ width: '100%', padding: 10, fontSize: 14 }}
+          >
+            {TEAM_MEMBERS.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={{ display: 'block', fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
+            Severity
+          </label>
+          <select
+            value={currentSeverity}
+            onChange={(e) => handleSeverityChange(e.target.value)}
+            disabled={loading}
+            style={{ width: '100%', padding: 10, fontSize: 14 }}
+          >
+            {SEVERITIES.map((sev) => (
+              <option key={sev} value={sev}>{sev}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Resolution Notes */}
       {needsResolutionNotes && (
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: 'block', fontSize: 14, marginBottom: 4, fontWeight: 600 }}>
@@ -86,27 +145,30 @@ export default function StatusActions({
         <p style={{ color: '#dc2626', fontSize: 14, marginBottom: 12 }}>{error}</p>
       )}
 
-      <div style={{ display: 'flex', gap: 8 }}>
-        {allowedTransitions.map((status) => (
-          <button
-            key={status}
-            onClick={() => handleTransition(status)}
-            disabled={loading}
-            style={{
-              padding: '10px 20px', fontSize: 14, fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              borderRadius: 6, border: 'none',
-              backgroundColor: status === 'Resolved' ? '#22c55e'
-                : status === 'In Progress' ? '#f59e0b'
-                : status === 'Closed' ? '#6b7280'
-                : '#2563eb',
-              color: 'white',
-            }}
-          >
-            {loading ? 'Updating...' : `Move to ${status}`}
-          </button>
-        ))}
-      </div>
+      {/* Status Transitions */}
+      {allowedTransitions.length > 0 && (
+        <div style={{ display: 'flex', gap: 8 }}>
+          {allowedTransitions.map((status) => (
+            <button
+              key={status}
+              onClick={() => handleTransition(status)}
+              disabled={loading}
+              style={{
+                padding: '10px 20px', fontSize: 14, fontWeight: 600,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                borderRadius: 6, border: 'none',
+                backgroundColor: status === 'Resolved' ? '#22c55e'
+                  : status === 'In Progress' ? '#f59e0b'
+                  : status === 'Closed' ? '#6b7280'
+                  : '#2563eb',
+                color: 'white',
+              }}
+            >
+              {loading ? 'Updating...' : `Move to ${status}`}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

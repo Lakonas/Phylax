@@ -2,6 +2,7 @@ import pool from '@/lib/db';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import StatusActions from './StatusActions';
+import Comments from './Comments';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   'Open': ['In Progress'],
@@ -163,7 +164,9 @@ export default async function IncidentDetailPage({
           </div>
         )}
       </div>
-
+        {/* Comments — Story #5, #13 */}
+          <Comments incidentId={incident.id} />
+          
       {/* Audit Trail */}
       <div>
         <h3 style={{ fontSize: 16, marginBottom: 12 }}>Activity Log</h3>

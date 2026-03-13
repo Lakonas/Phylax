@@ -1,8 +1,15 @@
+// CHANGED: added NextRequest import and auth
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { requireRole } from '@/lib/auth';
 
-// GET /api/settings
-export async function GET() {
+// CHANGED: added request parameter for auth
+// GET /api/settings — admin only
+export async function GET(request: NextRequest) {
+  // AUTH: admin only
+  const authResult = requireRole(request, ['admin']);
+  if (authResult instanceof Response) return authResult;
+
   try {
     const result = await pool.query('SELECT * FROM settings');
     const settings: Record<string, string> = {};
@@ -16,8 +23,12 @@ export async function GET() {
   }
 }
 
-// PATCH /api/settings
+// PATCH /api/settings — admin only
 export async function PATCH(request: NextRequest) {
+  // AUTH: admin only
+  const authResult = requireRole(request, ['admin']);
+  if (authResult instanceof Response) return authResult;
+
   try {
     const body = await request.json();
     const { key, value } = body;

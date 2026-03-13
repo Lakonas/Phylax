@@ -11,7 +11,9 @@ export interface AuthUser {
 }
 
 export function getUser(request: NextRequest): AuthUser | null {
+  
   const authHeader = request.headers.get('authorization');
+  console.log('Auth header received:', authHeader);
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+// CHANGED: added auth imports
+import { requireAuth, AuthUser } from '@/lib/auth';
 
 // GET /api/incidents/[id]/comments — Story #5
 export async function GET(
@@ -7,6 +9,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // AUTH: require logged-in user
+  const authResult = requireAuth(request);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const result = await pool.query(
@@ -32,14 +38,20 @@ export async function POST(
 ) {
   const { id } = await params;
 
+  // AUTH: require logged-in user, get their name
+  const authResult = requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const user = authResult as AuthUser;
+
   try {
     const body = await request.json();
-    const { author, body: commentBody, is_internal } = body;
+    // CHANGED: removed author from destructuring — comes from token now
+    const { body: commentBody, is_internal } = body;
 
     // OWASP #1: Input validation
-    if (!author || !commentBody) {
+    if (!commentBody) {
       return NextResponse.json(
-        { error: 'Author and comment body are required' },
+        { error: 'Comment body is required' },
         { status: 400 }
       );
     }
@@ -64,11 +76,12 @@ export async function POST(
       );
     }
 
+    // CHANGED: author is user.name from JWT
     const result = await pool.query(
       `INSERT INTO comments (incident_id, author, body, is_internal)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [id, author, commentBody, is_internal || false]
+      [id, user.name, commentBody, is_internal || false]
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

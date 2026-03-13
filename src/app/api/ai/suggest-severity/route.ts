@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+// CHANGED: added auth
+import { requireAuth } from '@/lib/auth';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -8,6 +10,10 @@ const client = new Anthropic({
 // POST /api/ai/suggest-severity — Story #2
 export async function POST(request: NextRequest) {
   try {
+    // AUTH: require logged-in user
+    const authResult = requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+
     const { title, description } = await request.json();
 
     if (!title || !description) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { authFetch } from '@/lib/api';
 
 export default function SettingsPage() {
   const [queueStrategy, setQueueStrategy] = useState('slap');
@@ -12,7 +13,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('/api/settings');
+        const response = await authFetch('/api/settings');
         if (response.ok) {
           const data = await response.json();
           setQueueStrategy(data.queue_strategy || 'slap');
@@ -31,9 +32,8 @@ export default function SettingsPage() {
     setMessage('');
 
     try {
-      const response = await fetch('/api/settings', {
+      const response = await authFetch('/api/settings', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, value }),
       });
 
@@ -74,7 +74,6 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Queue Strategy — Story #7, #20 */}
       <div style={{
         padding: 20, marginBottom: 24, borderRadius: 8,
         border: '1px solid #e5e7eb', backgroundColor: '#ffffff',
@@ -127,7 +126,6 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Stale Threshold — Story #20 */}
       <div style={{
         padding: 20, marginBottom: 24, borderRadius: 8,
         border: '1px solid #e5e7eb', backgroundColor: '#ffffff',
@@ -163,7 +161,6 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Team Members — Story #21 */}
       <div style={{
         padding: 20, borderRadius: 8,
         border: '1px solid #e5e7eb', backgroundColor: '#ffffff',

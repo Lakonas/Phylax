@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { requireRole, AuthUser } from '@/lib/auth';
+// CHANGED: added auth imports
+import { requireAuth, requireRole, AuthUser } from '@/lib/auth';
 
 // Valid state transitions — Story #11, #12
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -19,6 +20,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // AUTH: require logged-in user
+  const authResult = requireAuth(request);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const result = await pool.query(
@@ -50,14 +55,16 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  
+
+  // AUTH: require admin or agent role
   const authResult = requireRole(request, ['admin', 'agent']);
   if (authResult instanceof Response) return authResult;
   const user = authResult as AuthUser;
 
   try {
     const body = await request.json();
-    const { status, severity, category, assigned_to, resolution_notes, changed_by } = body;
+    // CHANGED: removed changed_by from destructuring — comes from token now
+    const { status, severity, category, assigned_to, resolution_notes } = body;
 
     // Fetch current incident
     const current = await pool.query(
@@ -106,6 +113,7 @@ export async function PATCH(
     const values: any[] = [];
     let paramCount = 1;
 
+    // CHANGED: changed_by now uses user.id from JWT token
     const trackChange = async (field: string, oldVal: string | null, newVal: string) => {
       if (oldVal !== newVal) {
         await pool.query(
@@ -121,11 +129,9 @@ export async function PATCH(
       values.push(status);
       await trackChange('status', incident.status, status);
 
-      // Set resolved_at timestamp
       if (status === 'Resolved') {
         updates.push(`resolved_at = NOW()`);
       }
-      // Set closed_at timestamp
       if (status === 'Closed') {
         updates.push(`closed_at = NOW()`);
       }
@@ -161,7 +167,6 @@ export async function PATCH(
       );
     }
 
-    // Always update the updated_at timestamp
     updates.push('updated_at = NOW()');
 
     values.push(id);

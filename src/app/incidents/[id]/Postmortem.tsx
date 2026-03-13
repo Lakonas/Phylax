@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { authFetch } from '@/lib/api';
 
 export default function Postmortem({ incidentId }: { incidentId: string }) {
   const [postmortem, setPostmortem] = useState('');
@@ -12,9 +13,8 @@ export default function Postmortem({ incidentId }: { incidentId: string }) {
     setError('');
 
     try {
-      const response = await fetch('/api/ai/postmortem', {
+      const response = await authFetch('/api/ai/postmortem', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ incident_id: incidentId }),
       });
 

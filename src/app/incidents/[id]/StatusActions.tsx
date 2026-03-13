@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { authFetch } from '@/lib/api';
 
 const SEVERITIES = ['P1', 'P2', 'P3', 'P4'];
 const TEAM_MEMBERS = ['Sarah Chen', 'James Park', 'Alex Rivera', 'Unassigned'];
@@ -29,7 +30,7 @@ export default function StatusActions({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/incidents/${incidentId}`, {
+      const response = await authFetch(`/api/incidents/${incidentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

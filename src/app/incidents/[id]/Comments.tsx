@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { authFetch } from '@/lib/api';
+
 interface Comment {
   id: string;
   author: string;
@@ -11,16 +13,16 @@ interface Comment {
 }
 
 export default function Comments({ incidentId }: { incidentId: string }) {
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isInternal, setIsInternal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { user, token } = useAuth();
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/incidents/${incidentId}/comments`);
+      const response = await authFetch(`/api/incidents/${incidentId}/comments`);
       if (response.ok) {
         const data = await response.json();
         setComments(data);
@@ -41,11 +43,9 @@ export default function Comments({ incidentId }: { incidentId: string }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/incidents/${incidentId}/comments`, {
+      const response = await authFetch(`/api/incidents/${incidentId}/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          author: 'Demo User',
           body: newComment,
           is_internal: isInternal,
         }),
@@ -74,7 +74,6 @@ export default function Comments({ incidentId }: { incidentId: string }) {
         Comments ({comments.length})
       </h3>
 
-      {/* Comment List */}
       {comments.length === 0 ? (
         <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 16 }}>No comments yet.</p>
       ) : (
@@ -109,7 +108,6 @@ export default function Comments({ incidentId }: { incidentId: string }) {
         </div>
       )}
 
-      {/* New Comment Form */}
       <div style={{
         padding: 12, borderRadius: 8,
         border: '1px solid #e5e7eb',

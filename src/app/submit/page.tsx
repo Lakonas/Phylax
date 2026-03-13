@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { authFetch } from '@/lib/api';
 
 export default function SubmitPage() {
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Other');
@@ -13,7 +15,6 @@ export default function SubmitPage() {
   const [error, setError] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState<{ severity: string; reason: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const { user, token } = useAuth();
 
   const handleSuggest = async () => {
     if (!title.trim() || !description.trim()) {
@@ -25,9 +26,8 @@ export default function SubmitPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/ai/suggest-severity', {
+      const response = await authFetch('/api/ai/suggest-severity', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description }),
       });
 
@@ -52,15 +52,13 @@ export default function SubmitPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/incidents', {
+      const response = await authFetch('/api/incidents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
           description,
           category,
           severity,
-          reported_by: user?.name || 'Anonymous',
         }),
       });
 
@@ -153,7 +151,6 @@ export default function SubmitPage() {
           </select>
         </div>
 
-        {/* AI Severity Suggestion — Story #2 */}
         <div style={{ marginBottom: 24 }}>
           <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
             Severity

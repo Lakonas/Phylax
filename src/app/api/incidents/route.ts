@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { requireAuth, AuthUser } from '@/lib/auth';
 
 // POST /api/incidents — User Story #1 (submit form), #3 (ticket number)
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { title, description, category, severity, reported_by } = body;
+    // AUTH: require logged-in user
+    const authResult = requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+    const user = authResult as AuthUser;
 
-    // OWASP #1: Input validation — reject missing required fields
-    if (!title || !description || !reported_by) {
+    const body = await request.json();
+    // CHANGED: removed reported_by from destructuring — comes from token now
+    const { title, description, category, severity } = body;
+
+    // CHANGED: removed reported_by check — user is guaranteed by auth
+    if (!title || !description) {
       return NextResponse.json(
-        { error: 'Title, description, and reported_by are required' },
+        { error: 'Title and description are required' },
         { status: 400 }
       );
     }
@@ -24,6 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // OWASP #3: Parameterized query — no SQL injection
+    // CHANGED: column is reported_by, value is user.name from JWT
     const result = await pool.query(
       `INSERT INTO incidents (title, description, category, severity, reported_by)
        VALUES ($1, $2, $3, $4, $5)
@@ -33,7 +41,7 @@ export async function POST(request: NextRequest) {
         description,
         category || 'Other',
         severity || 'P4',
-        reported_by
+        user.name
       ]
     );
 
@@ -53,6 +61,10 @@ export async function POST(request: NextRequest) {
 // GET /api/incidents — User Story #6 (triage queue), #4 (view status)
 export async function GET(request: NextRequest) {
   try {
+    // AUTH: require logged-in user
+    const authResult = requireAuth(request);
+    if (authResult instanceof Response) return authResult;
+
     // Read queue strategy from settings table — Story #7
     const settingsResult = await pool.query(
       "SELECT value FROM settings WHERE key = 'queue_strategy'"
@@ -65,7 +77,7 @@ export async function GET(request: NextRequest) {
       : 'ORDER BY severity ASC, created_at ASC';
 
     const result = await pool.query(
-      `SELECT * FROM incidents ${orderBy}`
+      `SELECT * FROM incidents WHERE status IN ('Open', 'In Progress') ${orderBy}`
     );
 
     return NextResponse.json(result.rows);

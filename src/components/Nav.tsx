@@ -26,7 +26,10 @@ export default function Nav() {
             <Link href="/dashboard" style={{ textDecoration: 'none', color: '#9ca3af', fontSize: 14 }}>
               Dashboard
             </Link>
-            {user.role === 'admin' && (
+            <Link href="/archive" style={{ textDecoration: 'none', color: '#9ca3af', fontSize: 14 }}>
+                Archive
+              </Link>
+              {user.role === 'admin' && (
               <Link href="/settings" style={{ textDecoration: 'none', color: '#9ca3af', fontSize: 14 }}>
                 Settings
               </Link>

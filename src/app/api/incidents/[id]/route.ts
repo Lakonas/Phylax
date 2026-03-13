@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { requireRole, AuthUser } from '@/lib/auth';
 
 // Valid state transitions — Story #11, #12
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -49,6 +50,10 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  
+  const authResult = requireRole(request, ['admin', 'agent']);
+  if (authResult instanceof Response) return authResult;
+  const user = authResult as AuthUser;
 
   try {
     const body = await request.json();
@@ -106,7 +111,7 @@ export async function PATCH(
         await pool.query(
           `INSERT INTO incident_history (incident_id, field_changed, old_value, new_value, changed_by)
            VALUES ($1, $2, $3, $4, $5)`,
-          [id, field, oldVal, newVal, changed_by || null]
+          [id, field, oldVal, newVal, user.id]
         );
       }
     };

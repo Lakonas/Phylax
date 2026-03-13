@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
+import { useAuth } from '@/lib/AuthContext';
 interface Comment {
   id: string;
   author: string;
@@ -16,6 +16,7 @@ export default function Comments({ incidentId }: { incidentId: string }) {
   const [isInternal, setIsInternal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { user, token } = useAuth();
 
   const fetchComments = async () => {
     try {

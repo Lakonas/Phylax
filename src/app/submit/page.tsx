@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function SubmitPage() {
   const [title, setTitle] = useState('');
@@ -12,6 +13,7 @@ export default function SubmitPage() {
   const [error, setError] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState<{ severity: string; reason: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const { user, token } = useAuth();
 
   const handleSuggest = async () => {
     if (!title.trim() || !description.trim()) {
@@ -58,7 +60,7 @@ export default function SubmitPage() {
           description,
           category,
           severity,
-          reported_by: 'Demo User',
+          reported_by: user?.name || 'Anonymous',
         }),
       });
 

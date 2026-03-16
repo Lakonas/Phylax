@@ -1,3 +1,4 @@
+import './globals.css';
 import Nav from '@/components/Nav';
 import { AuthProvider } from '@/lib/AuthContext';
 

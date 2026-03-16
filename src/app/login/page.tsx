@@ -3,6 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+/**
+ * Login/Register page — dual-mode auth form
+ * Handles both sign-in and registration with a toggle
+ * Includes recruiter demo credentials for portfolio evaluation
+ * Watermark background uses the Phylax geometric wolfhead logo
+ */
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -37,10 +43,11 @@ export default function LoginPage() {
         return;
       }
 
-      // Store token and user in cookie for server components
+      // Store JWT and user in cookies (24h expiry matches token TTL)
       document.cookie = `token=${data.token}; path=/; max-age=86400`;
       document.cookie = `user=${JSON.stringify(data.user)}; path=/; max-age=86400`;
 
+      // Full page redirect ensures AuthContext reads fresh cookies
       window.location.href = '/queue';
 
     } catch (err) {
@@ -50,110 +57,108 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '120px auto', padding: 24 }}>
-      <h1 style={{ textAlign: 'center', marginBottom: 8 }}>PHYLAX</h1>
-      <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: 32 }}>
-        {isRegister ? 'Create an account' : 'Sign in to continue'}
-      </p>
+    <div className="min-h-screen flex items-start justify-center pt-24 bg-[#1a1d23] relative overflow-hidden">
 
-      <form onSubmit={handleSubmit}>
-        {isRegister && (
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, fontSize: 14 }}>
-              Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              required
-              style={{ width: '100%', padding: 10, fontSize: 16 }}
-            />
+      {/* Watermark — geometric wolfhead as subtle brand stamp */}
+      <img
+        src="/phylax.jpg"
+        alt=""
+        aria-hidden="true"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] object-contain opacity-[0.15] pointer-events-none select-none"
+      />
+
+      <div className="w-full max-w-sm mx-4 relative z-10">
+
+        {/* Branding */}
+        <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-blue-400 tracking-widest" style={{ fontFamily: "'Bank Gothic', sans-serif" }}>PHYLAX</h1>
+          <p className="text-sm text-gray-400 mt-1">
+            {isRegister ? 'Create an account' : 'Sign in to continue'}
+          </p>
+        </div>
+
+        {/* Auth form card — transparent to show watermark */}
+        <div className="bg-blue-950/30 backdrop-blur-sm rounded-lg border border-blue-800/40 p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Name field — only visible in register mode */}
+            {isRegister && (
+              <div>
+                <label className="block text-sm font-medium text-blue-200 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  required
+                  className="w-full px-3 py-2 bg-[#1a1d23]/60 border border-blue-800/40 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-blue-200 mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                required
+                className="w-full px-3 py-2 bg-[#1a1d23]/60 border border-blue-800/40 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-blue-200 mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 8 characters"
+                required
+                className="w-full px-3 py-2 bg-[#1a1d23]/60 border border-blue-800/40 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-600 text-sm">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
+            </button>
+          </form>
+
+          {/* Toggle between login and register */}
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => { setIsRegister(!isRegister); setError(''); }}
+              className="text-sm text-blue-400 hover:text-blue-300"
+            >
+              {isRegister ? 'Already have an account? Sign In' : "Don't have an account? Register"}
+            </button>
           </div>
-        )}
-
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, fontSize: 14 }}>
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@company.com"
-            required
-            style={{ width: '100%', padding: 10, fontSize: 16 }}
-          />
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600, fontSize: 14 }}>
-            Password
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Minimum 8 characters"
-            required
-            style={{ width: '100%', padding: 10, fontSize: 16 }}
-          />
+        {/* Recruiter demo — pre-fills admin credentials for portfolio evaluation */}
+        <div className="mt-6 bg-blue-950/30 backdrop-blur-sm rounded-lg border border-blue-800/40 p-4 text-center shadow-sm">
+          <p className="text-xs text-blue-300/60 mb-2">Recruiter? Try the demo:</p>
+          <button
+            onClick={() => {
+              setEmail('admin@phylax.dev');
+              setPassword('password123');
+              setIsRegister(false);
+            }}
+            className="text-xs text-blue-400 border border-blue-400 px-3 py-1.5 rounded-md hover:bg-blue-900/30 transition-colors"
+          >
+            Fill Demo Credentials
+          </button>
         </div>
 
-        {error && (
-          <p style={{ color: '#dc2626', fontSize: 14, marginBottom: 16 }}>{error}</p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%', padding: 12, fontSize: 16, fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            borderRadius: 6, border: 'none',
-            backgroundColor: '#2563eb', color: 'white',
-          }}
-        >
-          {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
-        </button>
-      </form>
-
-      <p style={{ textAlign: 'center', marginTop: 16, fontSize: 14, color: '#6b7280' }}>
-        {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-        <button
-          onClick={() => { setIsRegister(!isRegister); setError(''); }}
-          style={{
-            background: 'none', border: 'none', color: '#2563eb',
-            cursor: 'pointer', fontSize: 14, textDecoration: 'underline',
-          }}
-        >
-          {isRegister ? 'Sign In' : 'Register'}
-        </button>
-      </p>
-
-      {/* Demo login for recruiters */}
-      <div style={{
-        marginTop: 32, padding: 16, borderRadius: 8,
-        backgroundColor: '#f9fafb', border: '1px solid #e5e7eb',
-        textAlign: 'center',
-      }}>
-        <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 8 }}>
-          Recruiter? Try the demo:
-        </p>
-        <button
-          onClick={() => {
-            setEmail('admin@phylax.dev');
-            setPassword('password123');
-            setIsRegister(false);
-          }}
-          style={{
-            background: 'none', border: '1px solid #2563eb', color: '#2563eb',
-            padding: '6px 16px', borderRadius: 6, cursor: 'pointer', fontSize: 13,
-          }}
-        >
-          Fill Demo Credentials
-        </button>
       </div>
     </div>
   );

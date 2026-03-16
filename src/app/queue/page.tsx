@@ -37,7 +37,7 @@ export default async function QueuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-200">
       <div className="max-w-6xl mx-auto px-6 py-10">
 
       {/* Header row — title and active queue strategy indicator */}

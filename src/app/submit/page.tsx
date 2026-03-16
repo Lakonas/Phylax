@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { authFetch } from '@/lib/api';
 
+/**
+ * Submit page — incident creation form with AI severity suggestion
+ * Client component — uses useState for form fields and authFetch for API calls
+ * AI suggest button sends title/description to Claude for severity recommendation
+ * User can accept or override the suggestion before submitting
+ */
 export default function SubmitPage() {
   const { user } = useAuth();
   const [title, setTitle] = useState('');
@@ -77,137 +83,139 @@ export default function SubmitPage() {
     }
   };
 
+  // Success state — shows ticket number after submission
   if (submitted) {
     return (
-      <div style={{ maxWidth: 600, margin: '80px auto', padding: 24 }}>
-        <h1>Incident Submitted</h1>
-        <p style={{ fontSize: 18, marginTop: 16 }}>
-          Your ticket number is <strong>{ticketNumber}</strong>
-        </p>
-        <button
-          onClick={() => {
-            setSubmitted(false);
-            setTitle('');
-            setDescription('');
-            setCategory('Other');
-            setSeverity('P4');
-            setAiSuggestion(null);
-          }}
-          style={{ marginTop: 24, padding: '10px 20px', cursor: 'pointer' }}
-        >
-          Submit Another
-        </button>
+      <div className="min-h-screen bg-gray-100">
+        <div className="max-w-lg mx-auto px-6 py-20 text-center">
+          <div className="bg-white rounded-lg border border-gray-200 p-10 shadow-sm">
+            <div className="text-green-600 text-5xl mb-4">✓</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Incident Submitted</h1>
+            <p className="text-gray-600 mb-1">Your ticket number is</p>
+            <p className="text-2xl font-mono font-bold text-blue-600 mb-8">{ticketNumber}</p>
+            <button
+              onClick={() => {
+                setSubmitted(false);
+                setTitle('');
+                setDescription('');
+                setCategory('Other');
+                setSeverity('P4');
+                setAiSuggestion(null);
+              }}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors"
+            >
+              Submit Another
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: '80px auto', padding: 24 }}>
-      <h1>Report an Incident</h1>
-      <form onSubmit={handleSubmit} style={{ marginTop: 24 }}>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
-            Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Brief summary of the issue"
-            required
-            style={{ width: '100%', padding: 10, fontSize: 16 }}
-          />
-        </div>
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-lg mx-auto px-6 py-10">
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="What happened? What's the impact?"
-            required
-            rows={5}
-            style={{ width: '100%', padding: 10, fontSize: 16 }}
-          />
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Report an Incident</h1>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
-            Category
-          </label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            style={{ width: '100%', padding: 10, fontSize: 16 }}
-          >
-            <option value="Infrastructure">Infrastructure</option>
-            <option value="Application">Application</option>
-            <option value="Network">Network</option>
-            <option value="Security">Security</option>
-            <option value="Access">Access</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+        {/* Form card */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-5">
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>
-            Severity
-          </label>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <select
-              value={severity}
-              onChange={(e) => setSeverity(e.target.value)}
-              style={{ flex: 1, padding: 10, fontSize: 16 }}
-            >
-              <option value="P1">P1 — Critical</option>
-              <option value="P2">P2 — High</option>
-              <option value="P3">P3 — Medium</option>
-              <option value="P4">P4 — Low</option>
-            </select>
-            <button
-              type="button"
-              onClick={handleSuggest}
-              disabled={aiLoading}
-              style={{
-                padding: '10px 16px', fontSize: 14, fontWeight: 600,
-                cursor: aiLoading ? 'not-allowed' : 'pointer',
-                borderRadius: 6, border: 'none',
-                backgroundColor: '#7c3aed', color: 'white',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {aiLoading ? 'Analyzing...' : 'AI Suggest'}
-            </button>
-          </div>
-
-          {aiSuggestion && (
-            <div style={{
-              marginTop: 8, padding: 12, borderRadius: 8,
-              backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd',
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#7c3aed', marginBottom: 4 }}>
-                AI Suggested: {aiSuggestion.severity}
-              </div>
-              <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
-                {aiSuggestion.reason}
-              </p>
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Brief summary of the issue"
+                required
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
-          )}
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="What happened? What's the impact?"
+                required
+                rows={5}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Application">Application</option>
+                <option value="Network">Network</option>
+                <option value="Security">Security</option>
+                <option value="Access">Access</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Severity with AI suggestion — the key differentiator */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+              <div className="flex gap-2 items-center">
+                <select
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value)}
+                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="P1">P1 — Critical</option>
+                  <option value="P2">P2 — High</option>
+                  <option value="P3">P3 — Medium</option>
+                  <option value="P4">P4 — Low</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={handleSuggest}
+                  disabled={aiLoading}
+                  className="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-md transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {aiLoading ? 'Analyzing...' : 'AI Suggest'}
+                </button>
+              </div>
+
+              {/* AI suggestion result — purple theme to distinguish from standard UI */}
+              {aiSuggestion && (
+                <div className="mt-2 p-3 rounded-lg bg-violet-50 border border-violet-200">
+                  <div className="text-sm font-semibold text-violet-700 mb-1">
+                    AI Suggested: {aiSuggestion.severity}
+                  </div>
+                  <p className="text-xs text-gray-600 m-0">
+                    {aiSuggestion.reason}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <p className="text-red-600 text-sm">{error}</p>
+            )}
+
+            {/* Submit — primary action, full width for emphasis */}
+            <button
+              type="submit"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-md transition-colors"
+            >
+              Submit Incident
+            </button>
+          </form>
         </div>
-
-        {error && (
-          <p style={{ color: 'red', marginBottom: 16 }}>{error}</p>
-        )}
-
-        <button
-          type="submit"
-          style={{ padding: '12px 32px', fontSize: 16, cursor: 'pointer' }}
-        >
-          Submit Incident
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

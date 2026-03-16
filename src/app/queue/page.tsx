@@ -1,7 +1,12 @@
 import pool from '@/lib/db';
 import Link from 'next/link';
 
-// Server component — no 'use client' needed, data fetched on the server
+/**
+ * Triage Queue — server component, queries database directly
+ * Reads queue strategy from settings to determine sort order
+ * Filters to active incidents only (Open, In Progress)
+ * Resolved/Closed tickets live in /archive
+ */
 export default async function QueuePage() {
   const settingsResult = await pool.query(
     "SELECT value FROM settings WHERE key = 'queue_strategy'"
@@ -17,98 +22,99 @@ export default async function QueuePage() {
   );
   const incidents = result.rows;
 
-  const severityColor: Record<string, string> = {
-    P1: '#dc2626',
-    P2: '#f59e0b',
-    P3: '#2563eb',
-    P4: '#6b7280',
+  // Severity badge color mapping — Tailwind classes per level
+  const severityStyle: Record<string, string> = {
+    P1: 'bg-red-600 text-white',
+    P2: 'bg-amber-500 text-white',
+    P3: 'bg-blue-600 text-white',
+    P4: 'bg-gray-500 text-white',
   };
 
-  const statusColor: Record<string, string> = {
-    'Open': '#dc2626',
-    'In Progress': '#f59e0b',
-    'Resolved': '#22c55e',
-    'Closed': '#6b7280',
+  // Status text color mapping
+  const statusStyle: Record<string, string> = {
+    'Open': 'text-red-600',
+    'In Progress': 'text-amber-500',
   };
 
   return (
-    <div style={{ maxWidth: 1200, margin: '40px auto', padding: 24 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1>Triage Queue</h1>
-        <span style={{ fontSize: 14, color: '#6b7280' }}>
-          Mode: <strong>{strategy.toUpperCase()}</strong>
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-6xl mx-auto px-6 py-10">
+
+      {/* Header row — title and active queue strategy indicator */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Triage Queue</h1>
+        <span className="text-sm text-gray-500">
+          Mode: <strong className="text-blue-600">{strategy.toUpperCase()}</strong>
         </span>
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
-            <th style={{ padding: '12px 8px' }}>Ticket</th>
-            <th style={{ padding: '12px 8px' }}>Title</th>
-            <th style={{ padding: '12px 8px' }}>Severity</th>
-            <th style={{ padding: '12px 8px' }}>Category</th>
-            <th style={{ padding: '12px 8px' }}>Status</th>
-            <th style={{ padding: '12px 8px' }}>Assigned To</th>
-            <th style={{ padding: '12px 8px' }}>Age</th>
-          </tr>
-        </thead>
-        <tbody>
-          {incidents.map((incident) => {
-            const age = Math.floor(
-              (Date.now() - new Date(incident.created_at).getTime()) / (1000 * 60 * 60)
-            );
-            const ageDisplay = age < 24 ? `${age}h` : `${Math.floor(age / 24)}d`;
+      {/* Incident table — sorted by FIFO or SLAP based on settings */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b-2 border-gray-200 bg-gray-50 text-left text-sm text-gray-600">
+              <th className="px-4 py-3">Ticket</th>
+              <th className="px-4 py-3">Title</th>
+              <th className="px-4 py-3">Severity</th>
+              <th className="px-4 py-3">Category</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Assigned To</th>
+              <th className="px-4 py-3">Age</th>
+            </tr>
+          </thead>
+          <tbody>
+            {incidents.map((incident) => {
+              const ageHours = Math.floor(
+                (Date.now() - new Date(incident.created_at).getTime()) / (1000 * 60 * 60)
+              );
+              const ageDisplay = ageHours < 24 ? `${ageHours}h` : `${Math.floor(ageHours / 24)}d`;
 
-            return (
-              <tr
-                key={incident.id}
-                style={{ borderBottom: '1px solid #f3f4f6' }}
-              >
-                <td style={{ padding: '12px 8px', fontFamily: 'monospace', fontSize: 14 }}>
-                  <Link href={`/incidents/${incident.id}`} style={{ color: '#2563eb', textDecoration: 'underline' }}>
-                    {incident.ticket_number}
-                  </Link>
-                </td>
-                <td style={{ padding: '12px 8px' }}>
-                  {incident.title}
-                </td>
-                <td style={{ padding: '12px 8px' }}>
-                  <span style={{
-                    backgroundColor: severityColor[incident.severity] || '#6b7280',
-                    color: 'white',
-                    padding: '2px 10px',
-                    borderRadius: 12,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}>
-                    {incident.severity}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 8px', fontSize: 14 }}>
-                  {incident.category}
-                </td>
-                <td style={{ padding: '12px 8px' }}>
-                  <span style={{
-                    color: statusColor[incident.status] || '#6b7280',
-                    fontWeight: 600,
-                    fontSize: 14,
-                  }}>
-                    {incident.status}
-                  </span>
-                </td>
-                <td style={{ padding: '12px 8px', fontSize: 14 }}>
-                  {incident.assigned_to || (
-                    <span style={{ color: '#dc2626', fontStyle: 'italic' }}>Unassigned</span>
-                  )}
-                </td>
-                <td style={{ padding: '12px 8px', fontSize: 14, color: '#6b7280' }}>
-                  {ageDisplay}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr
+                  key={incident.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  {/* Ticket number — clickable link to detail page */}
+                  <td className="px-4 py-3 font-mono text-sm">
+                    <Link href={`/incidents/${incident.id}`} className="text-blue-600 hover:text-blue-800 underline">
+                      {incident.ticket_number}
+                    </Link>
+                  </td>
+
+                  <td className="px-4 py-3 text-sm text-gray-900">{incident.title}</td>
+
+                  {/* Severity badge — color-coded pill */}
+                  <td className="px-4 py-3">
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${severityStyle[incident.severity] || 'bg-gray-500 text-white'}`}>
+                      {incident.severity}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 text-sm text-gray-600">{incident.category}</td>
+
+                  {/* Status — color-coded text */}
+                  <td className="px-4 py-3">
+                    <span className={`text-sm font-semibold ${statusStyle[incident.status] || 'text-gray-500'}`}>
+                      {incident.status}
+                    </span>
+                  </td>
+
+                  {/* Unassigned flagged in red to draw attention */}
+                  <td className="px-4 py-3 text-sm">
+                    {incident.assigned_to || (
+                      <span className="text-red-500 italic">Unassigned</span>
+                    )}
+                  </td>
+
+                  <td className="px-4 py-3 text-sm text-gray-500">{ageDisplay}</td>
+                </tr>
+                
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
     </div>
   );
 }

@@ -59,7 +59,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-start justify-center pt-24 bg-[#1a1d23] relative overflow-hidden">
 
-      {/* Watermark — geometric wolfhead as subtle brand stamp */}
+      {/* Watermark — geometric head as subtle brand stamp */}
       <img
         src="/phylax.jpg"
         alt=""

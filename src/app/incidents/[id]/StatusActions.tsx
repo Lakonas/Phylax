@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authFetch } from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
 
 const SEVERITIES = ['P1', 'P2', 'P3', 'P4'];
 const TEAM_MEMBERS = ['Sarah Chen', 'James Park', 'Alex Rivera', 'Unassigned'];
@@ -24,6 +25,7 @@ export default function StatusActions({
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const handleUpdate = async (body: Record<string, string | null>) => {
     setError('');
@@ -79,7 +81,8 @@ export default function StatusActions({
   };
 
   // Hide actions section entirely for closed incidents
-  if (currentStatus === 'Closed') {
+  // Hide actions for closed incidents and for submitters (read-only role)
+  if (currentStatus === 'Closed' || user?.role === 'submitter') {
     return null;
   }
 

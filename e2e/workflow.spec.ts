@@ -28,7 +28,7 @@ test.describe('Phylax Full Workflow', () => {
     await page.click('button[type="submit"]');
 
     await expect(page.locator('h1')).toHaveText('Incident Submitted');
-    await expect(page.locator('strong')).toContainText('PHX-');
+    await expect(page.getByText('PHX-', { exact: false })).toBeVisible();
   });
 
   test('should navigate to incident detail from queue', async ({ page }) => {
@@ -88,3 +88,23 @@ test.describe('Phylax Full Workflow', () => {
     await expect(page.locator('text=Sign in to continue')).toBeVisible();
   });
 });
+
+test('submitter should not see actions on incident detail', async ({ page }) => {
+  // Login as submitter — different role than the admin used in other tests
+  await page.goto('http://localhost:3000/login');
+  await page.fill('input[type="email"]', 'submitter@phylax.dev');
+  await page.fill('input[type="password"]', 'password123');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/queue');
+
+  // Navigate to first incident
+  const firstTicketLink = page.locator('table tbody a').first();
+  await firstTicketLink.click();
+  await page.waitForURL('**/incidents/**');
+
+  // Verify actions section is not visible for submitter role
+  await expect(page.locator('text=Move to')).not.toBeVisible();
+  await expect(page.locator('text=Settings')).not.toBeVisible();
+});
+
+

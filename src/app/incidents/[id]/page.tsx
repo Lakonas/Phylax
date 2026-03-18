@@ -5,6 +5,13 @@ import StatusActions from './StatusActions';
 import Comments from './Comments';
 import Postmortem from './Postmortem';
 
+/**
+ * Incident Detail — server component with embedded client components
+ * Fetches incident data and history directly from database
+ * StatusActions, Comments, and Postmortem are client components for interactivity
+ * Status flow bar visualizes the incident lifecycle position
+ */
+
 const VALID_TRANSITIONS: Record<string, string[]> = {
   'Open': ['In Progress'],
   'In Progress': ['Resolved'],
@@ -41,8 +48,12 @@ export default async function IncidentDetailPage({
   const allowedTransitions = VALID_TRANSITIONS[incident.status] || [];
   const currentStepIndex = STATUS_STEPS.indexOf(incident.status);
 
-  const severityColor: Record<string, string> = {
-    P1: '#dc2626', P2: '#f59e0b', P3: '#2563eb', P4: '#6b7280',
+  // Severity badge styles — same mapping used across queue and detail pages
+  const severityStyle: Record<string, string> = {
+    P1: 'bg-red-600 text-white',
+    P2: 'bg-amber-500 text-white',
+    P3: 'bg-blue-600 text-white',
+    P4: 'bg-gray-500 text-white',
   };
 
   const age = Math.floor(
@@ -51,155 +62,132 @@ export default async function IncidentDetailPage({
   const ageDisplay = age < 24 ? `${age}h` : `${Math.floor(age / 24)}d`;
 
   return (
-    <div style={{ maxWidth: 1000, margin: '40px auto', padding: 24 }}>
-      <Link href="/queue" style={{ color: '#2563eb', fontSize: 14 }}>
-        &larr; Back to Queue
-      </Link>
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-4xl mx-auto px-6 py-10">
 
-      {/* Header */}
-      <div style={{ marginTop: 16, marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 14, color: '#6b7280' }}>
-            {incident.ticket_number}
-          </span>
-          <span style={{
-            backgroundColor: severityColor[incident.severity] || '#6b7280',
-            color: 'white', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-          }}>
-            {incident.severity}
-          </span>
-          <span style={{ fontSize: 14, color: '#6b7280' }}>
-            {incident.category}
-          </span>
+        {/* Back navigation */}
+        <Link href="/queue" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
+          &larr; Back to Queue
+        </Link>
+
+        {/* Header — ticket metadata and title */}
+        <div className="mt-4 mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="font-mono text-sm text-gray-500">{incident.ticket_number}</span>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${severityStyle[incident.severity] || 'bg-gray-500 text-white'}`}>
+              {incident.severity}
+            </span>
+            <span className="text-sm text-gray-500">{incident.category}</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{incident.title}</h1>
+          <p className="text-sm text-gray-500">
+            Reported by {incident.reported_by} &middot; {ageDisplay} ago
+            {incident.assigned_to && <> &middot; Assigned to <strong className="text-gray-700">{incident.assigned_to}</strong></>}
+          </p>
         </div>
-        <h1 style={{ fontSize: 28, marginBottom: 8 }}>{incident.title}</h1>
-        <p style={{ color: '#6b7280', fontSize: 14 }}>
-          Reported by {incident.reported_by} &middot; {ageDisplay} ago
-          {incident.assigned_to && <> &middot; Assigned to <strong>{incident.assigned_to}</strong></>}
-        </p>
-      </div>
 
-      {/* Status Flow Bar */}
-      <div style={{
-        display: 'flex', gap: 0, marginBottom: 32, padding: 16,
-        backgroundColor: '#f9fafb', borderRadius: 8,
-      }}>
-        {STATUS_STEPS.map((step, index) => {
-          const isActive = index <= currentStepIndex;
-          const isCurrent = step === incident.status;
-          return (
-            <div key={step} style={{ flex: 1, textAlign: 'center' }}>
-              <div style={{
-                display: 'inline-block', width: 32, height: 32, borderRadius: '50%',
-                backgroundColor: isActive ? '#2563eb' : '#e5e7eb',
-                color: isActive ? 'white' : '#9ca3af',
-                lineHeight: '32px', fontSize: 14, fontWeight: 600,
-              }}>
-                {index + 1}
+        {/* Status flow bar — visualizes lifecycle position */}
+        <div className="flex mb-8 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+          {STATUS_STEPS.map((step, index) => {
+            const isActive = index <= currentStepIndex;
+            const isCurrent = step === incident.status;
+            return (
+              <div key={step} className="flex-1 text-center">
+                <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                  {index + 1}
+                </div>
+                <div className={`text-xs mt-1 ${isCurrent ? 'font-bold text-blue-600' : 'text-gray-500'}`}>
+                  {step}
+                </div>
               </div>
-              <div style={{
-                fontSize: 13, marginTop: 4,
-                fontWeight: isCurrent ? 700 : 400,
-                color: isCurrent ? '#2563eb' : '#6b7280',
-              }}>
-                {step}
-              </div>
+            );
+          })}
+        </div>
+
+        {/* Description card */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Description</h3>
+          <p className="text-sm text-gray-600 leading-relaxed">{incident.description}</p>
+        </div>
+
+        {/* Resolution notes — green card, only shown when resolved */}
+        {incident.resolution_notes && (
+          <div className="bg-green-50 rounded-lg border border-green-200 p-5 mb-6">
+            <h3 className="text-sm font-semibold text-green-800 mb-2">Resolution Notes</h3>
+            <p className="text-sm text-gray-700 leading-relaxed">{incident.resolution_notes}</p>
+          </div>
+        )}
+
+        {/* AI Postmortem — only for Resolved/Closed incidents */}
+        {(incident.status === 'Resolved' || incident.status === 'Closed') && (
+          <Postmortem incidentId={incident.id} />
+        )}
+
+        {/* Status actions — assignment, severity, transitions (client component) */}
+        <StatusActions
+          incidentId={incident.id}
+          currentStatus={incident.status}
+          currentSeverity={incident.severity}
+          currentAssignee={incident.assigned_to}
+          allowedTransitions={allowedTransitions}
+        />
+
+        {/* Metadata grid — timestamps and status at a glance */}
+        <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div>
+            <div className="text-xs text-gray-500 mb-1">Status</div>
+            <div className="text-sm font-semibold text-gray-900">{incident.status}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 mb-1">Created</div>
+            <div className="text-sm text-gray-700">{new Date(incident.created_at).toLocaleString()}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 mb-1">Last Updated</div>
+            <div className="text-sm text-gray-700">{new Date(incident.updated_at).toLocaleString()}</div>
+          </div>
+          {incident.resolved_at && (
+            <div>
+              <div className="text-xs text-gray-500 mb-1">Resolved At</div>
+              <div className="text-sm text-gray-700">{new Date(incident.resolved_at).toLocaleString()}</div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Description */}
-      <div style={{ marginBottom: 32 }}>
-        <h3 style={{ fontSize: 16, marginBottom: 8 }}>Description</h3>
-        <p style={{ lineHeight: 1.6, color: '#374151' }}>{incident.description}</p>
-      </div>
-
-      {/* Resolution Notes */}
-      {incident.resolution_notes && (
-        <div style={{
-          marginBottom: 32, padding: 16, borderRadius: 8,
-          border: '1px solid #86efac', backgroundColor: '#f0fdf4',
-        }}>
-          <h3 style={{ fontSize: 16, marginBottom: 8, color: '#166534' }}>Resolution Notes</h3>
-          <p style={{ lineHeight: 1.6, color: '#374151' }}>{incident.resolution_notes}</p>
+          )}
+          {incident.closed_at && (
+            <div>
+              <div className="text-xs text-gray-500 mb-1">Closed At</div>
+              <div className="text-sm text-gray-700">{new Date(incident.closed_at).toLocaleString()}</div>
+            </div>
+          )}
         </div>
-      )}
 
+        {/* Comments — threaded discussion with internal notes (client component) */}
+        <Comments incidentId={incident.id} />
 
-      {/* AI Postmortem — Story #18, only for Resolved/Closed */}
-      {(incident.status === 'Resolved' || incident.status === 'Closed') && (
-        <Postmortem incidentId={incident.id} />
-      )}
-          
-      {/* Status Actions */}
-      <StatusActions
-        incidentId={incident.id}
-        currentStatus={incident.status}
-        currentSeverity={incident.severity}
-        currentAssignee={incident.assigned_to}
-        allowedTransitions={allowedTransitions}
-      />
-
-      {/* Metadata Sidebar */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16,
-        marginBottom: 32, padding: 16, backgroundColor: '#f9fafb', borderRadius: 8,
-      }}>
-        <div>
-          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Status</div>
-          <div style={{ fontWeight: 600 }}>{incident.status}</div>
-        </div>
-        <div>
-          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Created</div>
-          <div>{new Date(incident.created_at).toLocaleString()}</div>
-        </div>
-        <div>
-          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Last Updated</div>
-          <div>{new Date(incident.updated_at).toLocaleString()}</div>
-        </div>
-        {incident.resolved_at && (
-          <div>
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Resolved At</div>
-            <div>{new Date(incident.resolved_at).toLocaleString()}</div>
-          </div>
-        )}
-        {incident.closed_at && (
-          <div>
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Closed At</div>
-            <div>{new Date(incident.closed_at).toLocaleString()}</div>
-          </div>
-        )}
-      </div>
-        {/* Comments — Story #5, #13 */}
-          <Comments incidentId={incident.id} />
-
-      {/* Audit Trail */}
-      <div>
-        <h3 style={{ fontSize: 16, marginBottom: 12 }}>Activity Log</h3>
-        {history.length === 0 ? (
-          <p style={{ color: '#6b7280', fontSize: 14 }}>No changes recorded yet.</p>
-        ) : (
-          <div style={{ borderLeft: '2px solid #e5e7eb', paddingLeft: 20 }}>
-            {history.map((entry) => (
-              <div key={entry.id} style={{ marginBottom: 16, position: 'relative' }}>
-                <div style={{
-                  position: 'absolute', left: -27, top: 4,
-                  width: 12, height: 12, borderRadius: '50%',
-                  backgroundColor: '#2563eb', border: '2px solid white',
-                }} />
-                <div style={{ fontSize: 14 }}>
-                  <strong>{entry.field_changed}</strong> changed
-                  from <span style={{ color: '#dc2626' }}>{entry.old_value || 'none'}</span>
-                  {' '}to <span style={{ color: '#22c55e' }}>{entry.new_value}</span>
+        {/* Audit trail — chronological change log */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-700 mb-4">Activity Log</h3>
+          {history.length === 0 ? (
+            <p className="text-sm text-gray-500">No changes recorded yet.</p>
+          ) : (
+            <div className="border-l-2 border-gray-200 pl-5">
+              {history.map((entry) => (
+                <div key={entry.id} className="mb-4 relative">
+                  {/* Timeline dot */}
+                  <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-blue-600 border-2 border-white" />
+                  <div className="text-sm">
+                    <strong className="text-gray-700">{entry.field_changed}</strong> changed
+                    from <span className="text-red-600">{entry.old_value || 'none'}</span>
+                    {' '}to <span className="text-green-600">{entry.new_value}</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    {new Date(entry.changed_at).toLocaleString()}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
-                  {new Date(entry.changed_at).toLocaleString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

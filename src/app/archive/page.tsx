@@ -1,5 +1,6 @@
 import pool from '@/lib/db';
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 
 /**
  * Archive — server component showing resolved and closed incidents

@@ -1,5 +1,6 @@
 import pool from '@/lib/db';
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 
 /**
  * Triage Queue — server component, queries database directly

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import StatusActions from './StatusActions';
 import Comments from './Comments';
 import Postmortem from './Postmortem';
+export const dynamic = 'force-dynamic';
 
 /**
  * Incident Detail — server component with embedded client components

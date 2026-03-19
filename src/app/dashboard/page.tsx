@@ -1,5 +1,5 @@
 import pool from '@/lib/db';
-
+export const dynamic = 'force-dynamic';
 /**
  * Dashboard — server component with operational metrics
  * All 8 queries run in parallel via Promise.all (AI Bug #4: O(n²) Sneak)

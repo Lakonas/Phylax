@@ -3,6 +3,12 @@
 import { useState } from 'react';
 import { authFetch } from '@/lib/api';
 
+/**
+ * Postmortem — client component for AI-generated incident analysis
+ * Only rendered for Resolved/Closed incidents (parent controls visibility)
+ * Sends full incident data to Claude for structured postmortem:
+ * Summary, Timeline, Root Cause, Impact, Resolution, Recommendations
+ */
 export default function Postmortem({ incidentId }: { incidentId: string }) {
   const [postmortem, setPostmortem] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,35 +41,29 @@ export default function Postmortem({ incidentId }: { incidentId: string }) {
   };
 
   return (
-    <div style={{ marginBottom: 32 }}>
+    <div className="mb-6">
+      {/* Generate button — purple theme to distinguish AI features */}
       {!postmortem && (
         <button
           onClick={handleGenerate}
           disabled={loading}
-          style={{
-            padding: '10px 20px', fontSize: 14, fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            borderRadius: 6, border: 'none',
-            backgroundColor: '#7c3aed', color: 'white',
-          }}
+          className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Generating Postmortem...' : 'Generate AI Postmortem'}
         </button>
       )}
 
       {error && (
-        <p style={{ color: '#dc2626', fontSize: 14, marginTop: 8 }}>{error}</p>
+        <p className="text-red-600 text-sm mt-2">{error}</p>
       )}
 
+      {/* Postmortem result — purple card matching AI suggestion theme */}
       {postmortem && (
-        <div style={{
-          marginTop: 12, padding: 20, borderRadius: 8,
-          backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd',
-        }}>
-          <h3 style={{ fontSize: 16, marginBottom: 12, color: '#7c3aed' }}>
+        <div className="mt-3 p-5 rounded-lg bg-violet-50 border border-violet-200">
+          <h3 className="text-sm font-semibold text-violet-700 mb-3">
             AI Postmortem Analysis
           </h3>
-          <div style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+          <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
             {postmortem}
           </div>
         </div>

@@ -57,7 +57,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center pt-24 bg-[#1a1d23] relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#1a1d23] relative overflow-hidden">
 
       {/* Watermark — geometric head as subtle brand stamp */}
       <img
@@ -70,12 +70,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm mx-4 relative z-10">
 
         {/* Branding */}
-        <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-blue-400 tracking-widest" style={{ fontFamily: "'Bank Gothic', sans-serif" }}>PHYLAX</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            {isRegister ? 'Create an account' : 'Sign in to continue'}
-          </p>
-        </div>
+     
 
         {/* Auth form card — transparent to show watermark */}
         <div className="bg-blue-950/30 backdrop-blur-sm rounded-lg border border-blue-800/40 p-6 shadow-sm">

@@ -18,17 +18,11 @@ export default function Nav() {
   if (pathname === '/login') return null;
 
   return (
-    <nav className="flex items-center justify-between px-6 py-4 mb-4 bg-[#1a1d23] text-white border-b border-gray-800">
+    <nav className="flex items-center justify-between px-6 py-7 bg-[#1a1d23] text-white border-b border-gray-800">
 
       {/* Brand — logo + wordmark */}
-      <Link href="/queue" className="flex items-center gap-3 no-underline">
-      <img src="/phylax.jpg" alt="Phylax" className="w-20 h-20 rounded-lg -my-2" />
-        <span
-          className="text-blue-400 text-lg tracking-widest"
-          style={{ fontFamily: "'Bank Gothic', sans-serif" }}
-        >
-          PHYLAX
-        </span>
+      <Link href="/queue" className="flex items-center no-underline">
+      <img src="/phylax.jpg" alt="Phylax" className="w-24 h-24 rounded-lg -my-7 brightness-145" />
       </Link>
 
       <div className="flex gap-6 items-center">

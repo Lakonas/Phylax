@@ -71,7 +71,9 @@ export default function LoginPage() {
 
         {/* Branding */}
      
-
+        <p className="text-center text-blue-400/70 text-sm tracking-wide mb-6">
+          See your queue. Know your capacity.
+        </p>
         {/* Auth form card — transparent to show watermark */}
         <div className="bg-blue-950/30 backdrop-blur-sm rounded-lg border border-blue-800/40 p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -71,7 +71,7 @@ export default function LoginPage() {
 
         {/* Branding */}
      
-        <p className="text-center text-blue-400/70 text-sm tracking-wide mb-6">
+        <p className="text-center text-blue-400/70 text-xl tracking-wide mb-6" style={{ fontFamily: "'Bank Gothic', sans-serif" }}>
           See your queue. Know your capacity.
         </p>
         {/* Auth form card — transparent to show watermark */}

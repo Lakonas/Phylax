@@ -45,7 +45,7 @@ export default async function QueuePage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Triage Queue</h1>
         <span className="text-sm text-gray-500">
-          Mode: <strong className="text-blue-600">{strategy.toUpperCase()}</strong>
+        Mode: <strong className="text-blue-600">{strategy === 'slap' ? 'SLA/P' : 'FIFO'}</strong>
         </span>
       </div>
 

@@ -100,7 +100,7 @@ export default function SettingsPage() {
               onClick={() => setQueueStrategy('slap')}
               className={`flex-1 p-4 rounded-lg cursor-pointer text-left transition-colors border-2 ${queueStrategy === 'slap' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
             >
-              <div className="font-bold text-gray-900 mb-1">SLAP</div>
+              <div className="font-bold text-gray-900 mb-1">SLA/P</div>
               <div className="text-xs text-gray-500">
                 SLA Protection. Severity-first sorting. P1s always surface to the top.
               </div>

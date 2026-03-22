@@ -14,8 +14,8 @@ export default async function DashboardPage() {
     closedCount,
     avgTTR,
     severityBreakdown,
-    staleIncidents,
     arrivalRate,
+    thresholdResult,
   ] = await Promise.all([
     pool.query("SELECT COUNT(*) FROM incidents WHERE status = 'Open'"),
     pool.query("SELECT COUNT(*) FROM incidents WHERE status = 'In Progress'"),
@@ -31,17 +31,22 @@ export default async function DashboardPage() {
       GROUP BY severity ORDER BY severity
     `),
     pool.query(`
-      SELECT * FROM incidents
-      WHERE status IN ('Open', 'In Progress')
-      AND created_at < NOW() - INTERVAL '48 hours'
-      ORDER BY severity ASC, created_at ASC
-    `),
-    pool.query(`
       SELECT COUNT(*) as total,
         EXTRACT(EPOCH FROM (NOW() - MIN(created_at))) / 86400 as days_span
       FROM incidents
     `),
+    pool.query("SELECT value FROM settings WHERE key = 'stale_threshold_hours'"),
   ]);
+
+  // Stale query uses configurable threshold — can't run in Promise.all since it depends on settings
+  const threshold = parseInt(thresholdResult.rows[0]?.value) || 48;
+  const staleIncidents = await pool.query(
+    `SELECT * FROM incidents
+     WHERE status IN ('Open', 'In Progress')
+     AND created_at < NOW() - INTERVAL '1 hour' * $1
+     ORDER BY severity ASC, created_at ASC`,
+    [threshold]
+  );
 
   const open = parseInt(openCount.rows[0].count);
   const inProgress = parseInt(inProgressCount.rows[0].count);
@@ -49,6 +54,7 @@ export default async function DashboardPage() {
   const closed = parseInt(closedCount.rows[0].count);
   const avgHours = avgTTR.rows[0].avg_hours || 0;
   const stale = staleIncidents.rows;
+  const staleHours = threshold;
 
   // Little's Law: L = λW
   const L = open + inProgress;
@@ -143,7 +149,7 @@ export default async function DashboardPage() {
             <h3 className="text-sm font-semibold text-gray-700">
               Stale Incidents ({stale.length})
               <span className="font-normal text-gray-400 ml-2">
-                Open or In Progress for 48+ hours
+              Open or In Progress for {staleHours}+ hours
               </span>
             </h3>
           </div>

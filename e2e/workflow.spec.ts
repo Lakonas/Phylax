@@ -70,7 +70,7 @@ test.describe('Phylax Full Workflow', () => {
     await expect(page.locator('h1')).toHaveText('Settings');
     await expect(page.getByRole('heading', { name: 'Queue Strategy' })).toBeVisible();
     await expect(page.getByText('FIFO', { exact: true })).toBeVisible();
-    await expect(page.getByText('SLAP', { exact: true })).toBeVisible();
+    await expect(page.getByText('SLA/P', { exact: true })).toBeVisible();
   });
 
   test('should view archive page', async ({ page }) => {
@@ -85,7 +85,7 @@ test.describe('Phylax Full Workflow', () => {
     await page.click('button:has-text("Logout")');
     await page.waitForURL('**/login');
 
-    await expect(page.locator('text=Sign in to continue')).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toBeVisible();
   });
 });
 

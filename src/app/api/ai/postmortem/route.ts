@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import pool from '@/lib/db';
-// CHANGED: added auth
-import { requireRole } from '@/lib/auth';
+import { requireRole, AuthUser } from '@/lib/auth';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -14,6 +13,7 @@ export async function POST(request: NextRequest) {
     // AUTH: admin or agent only
     const authResult = requireRole(request, ['admin', 'agent']);
     if (authResult instanceof Response) return authResult;
+    const user = authResult as AuthUser;
 
     const { incident_id } = await request.json();
 
@@ -24,8 +24,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY: scope incident lookup by role — admins see all, agents see only assigned
+    const incidentQuery = user.role === 'admin'
+      ? pool.query('SELECT * FROM incidents WHERE id = $1', [incident_id])
+      : pool.query(
+          'SELECT * FROM incidents WHERE id = $1 AND assigned_to = $2',
+          [incident_id, user.name]
+        );
+
     const [incidentResult, historyResult, commentsResult] = await Promise.all([
-      pool.query('SELECT * FROM incidents WHERE id = $1', [incident_id]),
+      incidentQuery,
       pool.query('SELECT * FROM incident_history WHERE incident_id = $1 ORDER BY changed_at ASC', [incident_id]),
       pool.query('SELECT * FROM comments WHERE incident_id = $1 ORDER BY created_at ASC', [incident_id]),
     ]);

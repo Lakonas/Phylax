@@ -30,17 +30,17 @@ Phylax fills that gap: purpose-built incident management with queue intelligence
 
 ---
 
+<!-- Add screenshots here -->
 ## Screenshots
 
-<!-- Add screenshots here -->
 | View | Screenshot |
 |------|-----------|
-| Login | |
-| Triage Queue | |
-| Submit with AI Suggestion | |
-| Incident Detail | |
-| Dashboard with Little's Law | |
-| Settings | |
+| Login | ![Login](docs/screenshots/phylaxlogin.png) |
+| Triage Queue | ![Queue](docs/screenshots/phylaxtriage.png) |
+| Submit with AI Suggestion | ![Submit](docs/screenshots/phylaxsubmit.png) |
+| Incident Detail | ![Detail](docs/screenshots/phylaxincident.png) |
+| Dashboard with Little's Law | ![Dashboard](docs/screenshots/phylaxdashboard.png) |
+| Settings | ![Settings](docs/screenshots/phylaxsettings.png) |
 
 ---
 
